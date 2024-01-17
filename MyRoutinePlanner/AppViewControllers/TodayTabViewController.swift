@@ -9,8 +9,8 @@ import UIKit
 
 class TodayTabViewController: UIViewController {
     
-    var tableView: UITableView? = nil
-    var data = ["mars", "earth", "jupiter", "venus", "saturn"]
+    var tableView: UITableView! = nil
+    var data = ["marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ", "earth", "jupiter", "venus", "saturn"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,18 +27,9 @@ class TodayTabViewController: UIViewController {
         
         // add
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
-
-        // configure UITableView
-        let navBarPlusStatusBarHeight = (navigationController?.navigationBar.frame.height)! + self.statusBarHeight
-        let tabBarHeight = (tabBarController?.tabBar.frame.height)!
-        let tableViewHeight = view.frame.height - (navBarPlusStatusBarHeight + tabBarHeight)
         
-        tableView = UITableView(frame: CGRect(x: 0.0, y: navBarPlusStatusBarHeight, width: view.frame.width, height: tableViewHeight))
-        tableView?.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView?.dataSource = self
-        tableView?.dragDelegate = self
-        
-        view.addSubview(tableView!)
+        // func for tableView configuration
+        configureTableView()
     }
     
 
@@ -51,15 +42,38 @@ class TodayTabViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    private func configureTableView() {
+        // configure UITableView
+//        let navBarPlusStatusBarHeight = (navigationController?.navigationBar.frame.height)! + self.statusBarHeight
+//        let tabBarHeight = (tabBarController?.tabBar.frame.height)!
+//        let tableViewHeight = view.frame.height - (navBarPlusStatusBarHeight + tabBarHeight)
+//        
+//        tableView = UITableView(frame: CGRect(x: 0.0, y: navBarPlusStatusBarHeight, width: view.frame.width, height: tableViewHeight))
+        self.tableView = UITableView(frame: CGRect(x: 0.0, y: 0.0, width: 0, height: 0))
+
+        self.tableView.register(UICustomTableViewCell.self, forCellReuseIdentifier: UICustomTableViewCell.identifier)
+        self.tableView.dataSource = self
+        self.tableView.dragDelegate = self
+        UICustomTableViewCell.delegate = self
+        
+        view.addSubview(self.tableView)
+        
+        self.tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            self.tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            self.tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            self.tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+        ])
+        
+        
+    }
 
     // MARK: - #selectors
     
     @objc func addNewActivity() {
         //TODO: - add activity
-//        data.append("smth new")
-//        tableView?.beginUpdates()
-//        tableView?.insertRows(at: [IndexPath.init(row: data.count - 1, section: 0)], with: .automatic)
-//        tableView?.endUpdates()
         let newActivityVC = AddActivityViewController()
         newActivityVC.modalPresentationStyle = .formSheet
         present(newActivityVC, animated: true)
@@ -72,16 +86,8 @@ extension TodayTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = "\(indexPath.row). \(data[indexPath.row])"
-        cell.textLabel?.numberOfLines = 0
-        
-        let checkbox = UICellAccessoryCheckbox(indexPath: indexPath)
-        checkbox.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        checkbox.setImage(UIImage(systemName: "circle"), for: .normal)
-        checkbox.addTarget(self, action: #selector(checkCheckbox(sender: )), for: .touchUpInside)
-        
-        cell.accessoryView = checkbox
+        let cell = tableView.dequeueReusableCell(withIdentifier: UICustomTableViewCell.identifier, for: indexPath) as! UICustomTableViewCell
+        cell.setText(data[indexPath.row])
         
         return cell
     }
@@ -98,15 +104,18 @@ extension TodayTabViewController: UITableViewDataSource {
             data.remove(at: indexPath.row)
             tableView.endUpdates()
     
-            perform(#selector(reloadSectionsWithDelay), with: nil, afterDelay: TimeInterval(0.3))
+            
+            reloadDataWithDelay(0.3)
             print(data)
         }
     }
     
-    // adds space when overflow in the row happens
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+//    // adds space when overflow in the row happens
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+////        print((tableView.cellForRow(at: indexPath) as! UICustomTableViewCell).labelSize.height)
+////        return UITableView.automaticDimension
+//        return UITableView.automaticDimension
+//    }
     
     // allows to dragAndDrop selected tableCell
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -118,29 +127,19 @@ extension TodayTabViewController: UITableViewDataSource {
         let temp = data[sourceIndexPath.row]
         data[sourceIndexPath.row] = data[destinationIndexPath.row]
         data[destinationIndexPath.row] = temp
-        perform(#selector(reloadSectionsWithDelay), with: nil, afterDelay: TimeInterval(0.0))
+        tableView.reloadData()
         print(data)
+    }
+    
+    @objc func reloadTableViewData() {
+        self.tableView.reloadData()
     }
     
     // MARK: UITableViewDataSource extension #selectors
-    @objc func checkCheckbox(sender: UICellAccessoryCheckbox) {
-        sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
-        perform(#selector(removeCheckedRow), with: sender, afterDelay: TimeInterval(0.5))
-    }
-    
-    @objc func removeCheckedRow(buttonInRow: UICellAccessoryCheckbox) {
-        tableView?.beginUpdates()
-        tableView?.deleteRows(at: [buttonInRow.indexPath!], with: .left)
-        data.remove(at: (buttonInRow.indexPath?.row)!)
-        tableView?.endUpdates()
         
-        perform(#selector(reloadSectionsWithDelay), with: nil, afterDelay: TimeInterval(0.3))
+    @objc func reloadDataWithDelay(_ delay: TimeInterval) {
+        perform(#selector(reloadTableViewData), with: nil, afterDelay: delay)
         
-        print(data)
-    }
-    
-    @objc func reloadSectionsWithDelay() {
-        tableView?.reloadSections(IndexSet(integersIn: 0..<1), with: .none)
     }
 }
 
@@ -149,5 +148,17 @@ extension TodayTabViewController: UITableViewDragDelegate {
         let dragItem = UIDragItem(itemProvider: NSItemProvider())
         dragItem.localObject = data[indexPath.row]
         return [dragItem]
+    }
+}
+
+extension TodayTabViewController: CustomTableViewCellDelegate {
+    func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
+        sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
+        self.tableView.beginUpdates()
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        self.data.remove(at: indexPath.row)
+        self.tableView.endUpdates()
+        
+        print(data)
     }
 }

@@ -19,6 +19,8 @@
 		ACA3D9472B54215500726D85 /* BrowseTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9462B54215500726D85 /* BrowseTabViewController.swift */; };
 		ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */; };
 		ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */; };
+		ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */; };
+		ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +38,8 @@
 		ACA3D9462B54215500726D85 /* BrowseTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseTabViewController.swift; sourceTree = "<group>"; };
 		ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICellAccessoryCheckbox.swift; sourceTree = "<group>"; };
 		ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityViewController.swift; sourceTree = "<group>"; };
+		ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICustomTableViewCell.swift; sourceTree = "<group>"; };
+		ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCellDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +72,7 @@
 		ACA3D92A2B540DDB00726D85 /* MyRoutinePlanner */ = {
 			isa = PBXGroup;
 			children = (
+				ACC2A7EE2B56D26B00582ECB /* Protocols */,
 				ACC2A7E52B55622800582ECB /* CustomUIElements */,
 				ACA3D93F2B5420E300726D85 /* AppViewControllers */,
 				ACA3D92B2B540DDB00726D85 /* AppDelegate.swift */,
@@ -97,8 +102,17 @@
 			isa = PBXGroup;
 			children = (
 				ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */,
+				ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */,
 			);
 			path = CustomUIElements;
+			sourceTree = "<group>";
+		};
+		ACC2A7EE2B56D26B00582ECB /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -172,10 +186,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */,
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,
 				ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */,
+				ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */,
 				ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */,
 				ACA3D9412B54212D00726D85 /* TodayTabViewController.swift in Sources */,
 				ACA3D9452B54214800726D85 /* SearchTabViewController.swift in Sources */,
