@@ -21,6 +21,7 @@
 		ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */; };
 		ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */; };
 		ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */; };
+		ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityViewController.swift; sourceTree = "<group>"; };
 		ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICustomTableViewCell.swift; sourceTree = "<group>"; };
 		ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCellDelegate.swift; sourceTree = "<group>"; };
+		ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyValuePairs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 		ACA3D92A2B540DDB00726D85 /* MyRoutinePlanner */ = {
 			isa = PBXGroup;
 			children = (
+				ACC2A7F12B595D9D00582ECB /* CustomStructures */,
 				ACC2A7EE2B56D26B00582ECB /* Protocols */,
 				ACC2A7E52B55622800582ECB /* CustomUIElements */,
 				ACA3D93F2B5420E300726D85 /* AppViewControllers */,
@@ -113,6 +116,14 @@
 				ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */,
 			);
 			path = Protocols;
+			sourceTree = "<group>";
+		};
+		ACC2A7F12B595D9D00582ECB /* CustomStructures */ = {
+			isa = PBXGroup;
+			children = (
+				ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */,
+			);
+			path = CustomStructures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -186,6 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */,
 				ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */,
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,

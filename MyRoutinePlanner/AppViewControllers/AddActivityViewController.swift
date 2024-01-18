@@ -8,15 +8,33 @@
 import UIKit
 
 class AddActivityViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        title = "New Activity"
-        view.backgroundColor = .white
+        setupView()
     }
     
+    func setupView() {
+        title = "Add Activity"
+        
+        view.backgroundColor = .white
+        
+        // navButtons config
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(closeView))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(addNewTask))
+    }
+    
+    // MARK: - #selectors
+    @objc func closeView() {
+        dismiss(animated: true)
+    }
+    
+    @objc func addNewTask() {
+        // TODO: - implement new task addition
+        print("New task saved.")
+    }
 
     /*
     // MARK: - Navigation

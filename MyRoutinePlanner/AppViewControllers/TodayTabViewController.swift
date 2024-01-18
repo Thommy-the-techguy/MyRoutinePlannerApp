@@ -10,7 +10,22 @@ import UIKit
 class TodayTabViewController: UIViewController {
     
     var tableView: UITableView! = nil
-    var data = ["marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ", "earth", "jupiter", "venus", "saturn"]
+    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs(
+        arrayOfKeys: [
+            "marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ",
+                      "earth",
+                      "jupiter",
+                      "venus",
+                      "saturn"
+        ],
+        arrayOfValues: [
+            Date(),
+            Calendar.current.date(byAdding: .day, value: 1, to: Date())!,
+            Calendar.current.date(byAdding: .day, value: 2, to: Date())!,
+            Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
+            Calendar.current.date(byAdding: .day, value: 4, to: Date())!
+        ]
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,11 +60,6 @@ class TodayTabViewController: UIViewController {
     
     private func configureTableView() {
         // configure UITableView
-//        let navBarPlusStatusBarHeight = (navigationController?.navigationBar.frame.height)! + self.statusBarHeight
-//        let tabBarHeight = (tabBarController?.tabBar.frame.height)!
-//        let tableViewHeight = view.frame.height - (navBarPlusStatusBarHeight + tabBarHeight)
-//        
-//        tableView = UITableView(frame: CGRect(x: 0.0, y: navBarPlusStatusBarHeight, width: view.frame.width, height: tableViewHeight))
         self.tableView = UITableView(frame: CGRect(x: 0.0, y: 0.0, width: 0, height: 0))
 
         self.tableView.register(UICustomTableViewCell.self, forCellReuseIdentifier: UICustomTableViewCell.identifier)
@@ -66,8 +76,6 @@ class TodayTabViewController: UIViewController {
             self.tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             self.tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
         ])
-        
-        
     }
 
     // MARK: - #selectors
@@ -75,19 +83,22 @@ class TodayTabViewController: UIViewController {
     @objc func addNewActivity() {
         //TODO: - add activity
         let newActivityVC = AddActivityViewController()
-        newActivityVC.modalPresentationStyle = .formSheet
-        present(newActivityVC, animated: true)
+        let newActivityNavigationController = UINavigationController(rootViewController: newActivityVC)
+        newActivityNavigationController.modalPresentationStyle = .formSheet
+        present(newActivityNavigationController, animated: true)
     }
 }
 
 extension TodayTabViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data.count
+        return newDataWithDate.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UICustomTableViewCell.identifier, for: indexPath) as! UICustomTableViewCell
-        cell.setText(data[indexPath.row])
+        cell.setText(newDataWithDate.getKey(for: indexPath.row))
+        cell.setDate(newDataWithDate.getValue(for: indexPath.row))
+        
         
         return cell
     }
@@ -101,21 +112,14 @@ extension TodayTabViewController: UITableViewDataSource {
         if editingStyle == .delete {
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            data.remove(at: indexPath.row)
+            newDataWithDate.removeKeyAndValue(for: indexPath.row)
             tableView.endUpdates()
     
             
             reloadDataWithDelay(0.3)
-            print(data)
+            print(newDataWithDate)
         }
     }
-    
-//    // adds space when overflow in the row happens
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-////        print((tableView.cellForRow(at: indexPath) as! UICustomTableViewCell).labelSize.height)
-////        return UITableView.automaticDimension
-//        return UITableView.automaticDimension
-//    }
     
     // allows to dragAndDrop selected tableCell
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -124,11 +128,11 @@ extension TodayTabViewController: UITableViewDataSource {
     
     // swapping two items with drag and drop
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let temp = data[sourceIndexPath.row]
-        data[sourceIndexPath.row] = data[destinationIndexPath.row]
-        data[destinationIndexPath.row] = temp
+        let temp = newDataWithDate.getKeyAndValue(for: sourceIndexPath.row)
+        newDataWithDate.setKeyAndValue(for: sourceIndexPath.row, key: newDataWithDate.getKey(for: destinationIndexPath.row), value: newDataWithDate.getValue(for: destinationIndexPath.row))
+        newDataWithDate.setKeyAndValue(for: destinationIndexPath.row, key: temp.key, value: temp.value)
         tableView.reloadData()
-        print(data)
+        print(newDataWithDate)
     }
     
     @objc func reloadTableViewData() {
@@ -146,7 +150,7 @@ extension TodayTabViewController: UITableViewDataSource {
 extension TodayTabViewController: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         let dragItem = UIDragItem(itemProvider: NSItemProvider())
-        dragItem.localObject = data[indexPath.row]
+        dragItem.localObject = newDataWithDate.getKey(for: indexPath.row)
         return [dragItem]
     }
 }
@@ -156,9 +160,9 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
-        self.data.remove(at: indexPath.row)
+        self.newDataWithDate.removeKeyAndValue(for: indexPath.row)
         self.tableView.endUpdates()
         
-        print(data)
+        print(newDataWithDate)
     }
 }
