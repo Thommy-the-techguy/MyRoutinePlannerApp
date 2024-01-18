@@ -22,6 +22,7 @@
 		ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */; };
 		ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */; };
 		ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */; };
+		ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICustomTableViewCell.swift; sourceTree = "<group>"; };
 		ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCellDelegate.swift; sourceTree = "<group>"; };
 		ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyValuePairs.swift; sourceTree = "<group>"; };
+		ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */,
+				ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -209,6 +212,7 @@
 				ACA3D9452B54214800726D85 /* SearchTabViewController.swift in Sources */,
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
 				ACA3D9472B54215500726D85 /* BrowseTabViewController.swift in Sources */,
+				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

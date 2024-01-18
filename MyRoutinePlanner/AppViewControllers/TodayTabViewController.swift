@@ -83,6 +83,7 @@ class TodayTabViewController: UIViewController {
     @objc func addNewActivity() {
         //TODO: - add activity
         let newActivityVC = AddActivityViewController()
+        newActivityVC.delegate = self
         let newActivityNavigationController = UINavigationController(rootViewController: newActivityVC)
         newActivityNavigationController.modalPresentationStyle = .formSheet
         present(newActivityNavigationController, animated: true)
@@ -164,5 +165,12 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         self.tableView.endUpdates()
         
         print(newDataWithDate)
+    }
+}
+
+extension TodayTabViewController: AddActivityDelegate {
+    func saveNewTask(_ newTask: String, taskDate: Date) {
+        self.newDataWithDate.append(key: newTask, value: taskDate)
+        self.tableView.reloadData()
     }
 }

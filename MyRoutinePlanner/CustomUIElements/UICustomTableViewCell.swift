@@ -71,6 +71,10 @@ class UICustomTableViewCell: UITableViewCell {
         }
     }
     
+    override func prepareForReuse() {
+        self.checkButton.setImage(UIImage(systemName: "circle"), for: .normal)
+    }
+    
     private func setupUI() {
         self.contentView.addSubview(checkButton)
         self.contentView.addSubview(label)
