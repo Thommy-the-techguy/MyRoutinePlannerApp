@@ -10,7 +10,7 @@ import UIKit
 class TodayTabViewController: UIViewController {
     
     var tableView: UITableView! = nil
-    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs(
+    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs()/*CustomKeyValuePairs(
         arrayOfKeys: [
             "marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ",
                       "earth",
@@ -25,14 +25,20 @@ class TodayTabViewController: UIViewController {
             Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
             Calendar.current.date(byAdding: .day, value: 4, to: Date())!
         ]
-    )
+    )*/
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        // add notification observer for starting app
+        NotificationCenter.default.addObserver(self, selector: #selector(readData), name: Notification.Name("AppLoaded"), object: nil)
+        
+        // add notification observer for terminating app
+        NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
+        
         // setting view's background color
-        view.backgroundColor = .white
+        view.backgroundColor = .systemGray6
         
         // scroll edge initialization for navBar
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
@@ -61,7 +67,9 @@ class TodayTabViewController: UIViewController {
     private func configureTableView() {
         // configure UITableView
         self.tableView = UITableView(frame: CGRect(x: 0.0, y: 0.0, width: 0, height: 0))
-
+        tableView.backgroundColor = .systemGray6
+        tableView.layer.cornerRadius = 20
+        
         self.tableView.register(UICustomTableViewCell.self, forCellReuseIdentifier: UICustomTableViewCell.identifier)
         self.tableView.dataSource = self
         self.tableView.dragDelegate = self
@@ -81,12 +89,37 @@ class TodayTabViewController: UIViewController {
     // MARK: - #selectors
     
     @objc func addNewActivity() {
-        //TODO: - add activity
         let newActivityVC = AddActivityViewController()
         newActivityVC.delegate = self
         let newActivityNavigationController = UINavigationController(rootViewController: newActivityVC)
         newActivityNavigationController.modalPresentationStyle = .formSheet
         present(newActivityNavigationController, animated: true)
+    }
+    
+    
+    // process app termination
+    @objc func saveData() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(self.newDataWithDate) {
+            UserDefaults.standard.set(encoded, forKey: "TodayTasks")
+            print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
+        } else {
+            print("An encoding error has ocurred!")
+        }
+    }
+    
+    // process readingSavedData when scene will load
+    @objc func readData() {
+        if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
+            let decoder = JSONDecoder()
+            if let loadedData = try? decoder.decode(CustomKeyValuePairs<String, Date>.self, from: savedData) {
+                self.newDataWithDate = loadedData
+                
+                self.tableView.reloadData()
+                
+                print("data has been loaded.")
+            }
+        }
     }
 }
 
@@ -97,6 +130,7 @@ extension TodayTabViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UICustomTableViewCell.identifier, for: indexPath) as! UICustomTableViewCell
+        cell.backgroundColor = .white
         cell.setText(newDataWithDate.getKey(for: indexPath.row))
         cell.setDate(newDataWithDate.getValue(for: indexPath.row))
         

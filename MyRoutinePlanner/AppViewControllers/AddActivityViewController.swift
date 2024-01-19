@@ -25,7 +25,7 @@ class AddActivityViewController: UIViewController {
     private func setupView() {
         title = "Add Activity"
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemGray6
         
         // navButtons config
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(closeView))
@@ -40,9 +40,10 @@ class AddActivityViewController: UIViewController {
         textView.text = placeholderText
         textView.textColor = .lightGray
         textView.font = .systemFont(ofSize: 21.0)
+        textView.backgroundColor = .white
 //        textView.backgroundColor = .red
         textView.layer.borderWidth = 1.0
-        textView.layer.borderColor = UIColor.lightGray.cgColor
+        textView.layer.borderColor = UIColor.white.cgColor
         textView.layer.cornerRadius = 10.0
         
         view.addSubview(textView)

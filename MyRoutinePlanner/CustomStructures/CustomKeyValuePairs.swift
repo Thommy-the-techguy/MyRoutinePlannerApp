@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CustomKeyValuePairs<K, V> {
+struct CustomKeyValuePairs<K: Codable, V: Codable> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
     
@@ -15,6 +15,10 @@ struct CustomKeyValuePairs<K, V> {
         get {
             return arrayOfKeys.count
         }
+    }
+    
+    init() {
+        
     }
     
     init(arrayOfKeys: [K], arrayOfValues: [V]) {
@@ -60,4 +64,8 @@ struct CustomKeyValuePairs<K, V> {
         
         return (key, value)
     }
+}
+
+extension CustomKeyValuePairs: Codable {
+    
 }
