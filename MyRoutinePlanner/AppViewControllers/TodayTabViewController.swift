@@ -88,7 +88,7 @@ class TodayTabViewController: UIViewController {
 
     // MARK: - #selectors
     
-    @objc func addNewActivity() {
+    @objc private func addNewActivity() {
         let newActivityVC = AddActivityViewController()
         newActivityVC.delegate = self
         let newActivityNavigationController = UINavigationController(rootViewController: newActivityVC)
@@ -98,7 +98,7 @@ class TodayTabViewController: UIViewController {
     
     
     // process app termination
-    @objc func saveData() {
+    @objc private func saveData() {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(self.newDataWithDate) {
             UserDefaults.standard.set(encoded, forKey: "TodayTasks")
