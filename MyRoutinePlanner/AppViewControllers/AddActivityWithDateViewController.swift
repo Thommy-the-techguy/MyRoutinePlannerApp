@@ -31,6 +31,9 @@ class AddActivityWithDateViewController: UIViewController {
     var contentView: UIView!
     
     var textView: UITextView!
+    
+    weak var delegate: AddActivityDelegate?
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -139,9 +142,18 @@ class AddActivityWithDateViewController: UIViewController {
         dismiss(animated: true)
     }
     
+    // add new task with date
     @objc private func addNewTask() {
         // TODO: add new task logic
-        print("New event with date.")
+        let alertController = UIAlertController(title: "Error", message: "You have to write something first in order to save it!", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
+        
+        if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
+            self.present(alertController, animated: true)
+        } else {
+            delegate?.saveNewTask(self.textView.text, taskDate: datePicker.date)
+            dismiss(animated: true)
+        }
     }
 
     @objc func keyboardWillShow(notification: NSNotification) {

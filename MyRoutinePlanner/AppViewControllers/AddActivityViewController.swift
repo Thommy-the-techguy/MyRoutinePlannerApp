@@ -77,9 +77,8 @@ class AddActivityViewController: UIViewController {
             self.present(alertController, animated: true)
         } else {
             delegate?.saveNewTask(self.textView.text, taskDate: Date())
+            dismiss(animated: true)
         }
-        
-        dismiss(animated: true)
     }
 
     /*

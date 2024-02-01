@@ -46,7 +46,7 @@ class UICustomTableViewCell: UITableViewCell {
             return (width: label.frame.width, height: label.frame.height)
         }
     }
-    static weak var delegate: CustomTableViewCellDelegate?
+    weak var delegate: CustomTableViewCellDelegate?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -69,6 +69,14 @@ class UICustomTableViewCell: UITableViewCell {
         } else {
             dateTextLabel.text = self.date?.description
         }
+    }
+    
+    func getCellTextLabel() -> UILabel {
+        return self.label
+    }
+    
+    func getCellDateLabel() -> UILabel {
+        return self.dateTextLabel
     }
     
     override func prepareForReuse() {
@@ -113,7 +121,7 @@ class UICustomTableViewCell: UITableViewCell {
     // MARK: - selectors
     
     @objc func buttonAction(sender: UIButton) {
-        if let delegate = UICustomTableViewCell.delegate {
+        if let delegate = self.delegate {
             delegate.removeCheckedRow(sender: sender, indexPath: self.indexPath!)
         } else {
             fatalError("CustomTableViewCellDelegate was not assigned!")

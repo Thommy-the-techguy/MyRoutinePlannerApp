@@ -10,7 +10,10 @@ import UIKit
 class TodayTabViewController: UIViewController {
     
     var tableView: UITableView! = nil
-    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs()/*CustomKeyValuePairs(
+//    let storage = Storage()
+//    var newDataWithDate = Storage.inboxData["Today"] ?? CustomKeyValuePairs()
+//    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs()
+    /*CustomKeyValuePairs(
         arrayOfKeys: [
             "marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ",
                       "earth",
@@ -26,16 +29,18 @@ class TodayTabViewController: UIViewController {
             Calendar.current.date(byAdding: .day, value: 4, to: Date())!
         ]
     )*/
+    var activityViewController: UIActivityViewController?
+    var selectedRowIndexPath: IndexPath?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        // add notification observer for starting app
-        NotificationCenter.default.addObserver(self, selector: #selector(readData), name: Notification.Name("AppLoaded"), object: nil)
-        
-        // add notification observer for terminating app
-        NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
+//        // add notification observer for starting app
+//        NotificationCenter.default.addObserver(self, selector: #selector(readData), name: Notification.Name("AppLoaded"), object: nil)
+//        
+//        // add notification observer for terminating app
+//        NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
         
         // setting view's background color
         view.backgroundColor = .systemGray6
@@ -48,6 +53,9 @@ class TodayTabViewController: UIViewController {
         
         // add
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
+        
+        // share
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.arrow.up"), style: .done, target: self, action: #selector(shareViewAppear))
         
         // func for tableView configuration
         configureTableView()
@@ -71,9 +79,9 @@ class TodayTabViewController: UIViewController {
         tableView.layer.cornerRadius = 20
         
         self.tableView.register(UICustomTableViewCell.self, forCellReuseIdentifier: UICustomTableViewCell.identifier)
+        self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.dragDelegate = self
-        UICustomTableViewCell.delegate = self
         
         view.addSubview(self.tableView)
         
@@ -97,42 +105,65 @@ class TodayTabViewController: UIViewController {
     }
     
     
-    // process app termination
-    @objc private func saveData() {
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(self.newDataWithDate) {
-            UserDefaults.standard.set(encoded, forKey: "TodayTasks")
-            print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
-        } else {
-            print("An encoding error has ocurred!")
-        }
-    }
+//    // process app termination
+//    @objc private func saveData() {
+//        let encoder = JSONEncoder()
+//        if let encoded = try? encoder.encode(self.newDataWithDate) {
+//            UserDefaults.standard.set(encoded, forKey: "TodayTasks")
+//            print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
+//        } else {
+//            print("An encoding error has ocurred!")
+//        }
+//    }
+//    
+//    // process readingSavedData when scene will load
+//    @objc func readData() {
+//        if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
+//            let decoder = JSONDecoder()
+//            if let loadedData = try? decoder.decode(CustomKeyValuePairs<String, Date>.self, from: savedData) {
+//                self.newDataWithDate = loadedData
+//                
+//                self.tableView.reloadData()
+//                
+//                print("data has been loaded.")
+//            }
+//        }
+//    }
     
-    // process readingSavedData when scene will load
-    @objc func readData() {
-        if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
-            let decoder = JSONDecoder()
-            if let loadedData = try? decoder.decode(CustomKeyValuePairs<String, Date>.self, from: savedData) {
-                self.newDataWithDate = loadedData
-                
-                self.tableView.reloadData()
-                
-                print("data has been loaded.")
-            }
+    
+    
+    // share note functionality
+    
+    @objc func shareViewAppear() {
+        if let selectedRowIndexPath = self.selectedRowIndexPath {
+            let selectedCell = tableView.cellForRow(at: selectedRowIndexPath) as! UICustomTableViewCell
+            let cellLabel = selectedCell.getCellTextLabel()
+            let cellDate = selectedCell.getCellDateLabel()
+            
+            activityViewController = UIActivityViewController(activityItems: [cellLabel.text ?? "", cellDate.text ?? ""], applicationActivities: nil)
+            self.present(activityViewController!, animated: true)
+        } else {
+            print("No row selected.")
         }
     }
 }
 
 extension TodayTabViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return newDataWithDate.count
+        return Storage.inboxData["Today"]?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UICustomTableViewCell.identifier, for: indexPath) as! UICustomTableViewCell
+        
+        cell.delegate = self
+        
         cell.backgroundColor = .white
-        cell.setText(newDataWithDate.getKey(for: indexPath.row))
-        cell.setDate(newDataWithDate.getValue(for: indexPath.row))
+//        cell.setText(newDataWithDate.getKey(for: indexPath.row))
+//        cell.setDate(newDataWithDate.getValue(for: indexPath.row))
+        
+        cell.setText((Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
+        cell.setDate((Storage.inboxData["Today"]?.getValue(for: indexPath.row))!)
         
         
         return cell
@@ -147,12 +178,13 @@ extension TodayTabViewController: UITableViewDataSource {
         if editingStyle == .delete {
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            newDataWithDate.removeKeyAndValue(for: indexPath.row)
+//            newDataWithDate.removeKeyAndValue(for: indexPath.row)
+            Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
             tableView.endUpdates()
     
             
             reloadDataWithDelay(0.3)
-            print(newDataWithDate)
+            print(Storage.inboxData["Today"] as Any)
         }
     }
     
@@ -163,11 +195,25 @@ extension TodayTabViewController: UITableViewDataSource {
     
     // swapping two items with drag and drop
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let temp = newDataWithDate.getKeyAndValue(for: sourceIndexPath.row)
-        newDataWithDate.setKeyAndValue(for: sourceIndexPath.row, key: newDataWithDate.getKey(for: destinationIndexPath.row), value: newDataWithDate.getValue(for: destinationIndexPath.row))
-        newDataWithDate.setKeyAndValue(for: destinationIndexPath.row, key: temp.key, value: temp.value)
-        tableView.reloadData()
-        print(newDataWithDate)
+//        let temp = newDataWithDate.getKeyAndValue(for: sourceIndexPath.row)
+//        newDataWithDate.setKeyAndValue(for: sourceIndexPath.row, key: newDataWithDate.getKey(for: destinationIndexPath.row), value: newDataWithDate.getValue(for: destinationIndexPath.row))
+//        newDataWithDate.setKeyAndValue(for: destinationIndexPath.row, key: temp.key, value: temp.value)
+        let sourceSection = sourceIndexPath.section
+        let destinationSection = destinationIndexPath.section
+        
+        let sourceRowIndex = sourceIndexPath.row
+        let destinationRowIndex = destinationIndexPath.row
+        
+        
+        let temp = Storage.inboxData["Today"]?.getKeyAndValue(for: sourceRowIndex)
+        let destinationKeyAndValue = Storage.inboxData["Today"]?.getKeyAndValue(for: destinationRowIndex)
+        
+        
+        Storage.inboxData["Today"]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
+        Storage.inboxData["Today"]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
+        
+        
+        print(Storage.inboxData["Today"] as Any)
     }
     
     @objc func reloadTableViewData() {
@@ -178,15 +224,22 @@ extension TodayTabViewController: UITableViewDataSource {
         
     @objc func reloadDataWithDelay(_ delay: TimeInterval) {
         perform(#selector(reloadTableViewData), with: nil, afterDelay: delay)
-        
     }
 }
 
 extension TodayTabViewController: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         let dragItem = UIDragItem(itemProvider: NSItemProvider())
-        dragItem.localObject = newDataWithDate.getKey(for: indexPath.row)
+//        dragItem.localObject = newDataWithDate.getKey(for: indexPath.row)
+        dragItem.localObject = Storage.inboxData["Today"]?.getKey(for: indexPath.row)
         return [dragItem]
+    }
+}
+
+extension TodayTabViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.selectedRowIndexPath = indexPath
+        print("Row at \(indexPath.row) has been selected")
     }
 }
 
@@ -195,16 +248,31 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
-        self.newDataWithDate.removeKeyAndValue(for: indexPath.row)
+//        self.newDataWithDate.removeKeyAndValue(for: indexPath.row)
+        Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
         self.tableView.endUpdates()
         
-        print(newDataWithDate)
+        print(Storage.inboxData["Today"] ?? "nil")
     }
 }
 
 extension TodayTabViewController: AddActivityDelegate {
     func saveNewTask(_ newTask: String, taskDate: Date) {
-        self.newDataWithDate.append(key: newTask, value: taskDate)
+//        self.newDataWithDate.append(key: newTask, value: taskDate)
+        guard var keyValuePairs = Storage.inboxData["Today"] else {
+            Storage.inboxData["Today"] = CustomKeyValuePairs(
+                arrayOfKeys: [newTask],
+                arrayOfValues: [taskDate]
+            )
+            
+            self.tableView.reloadData()
+            
+            return
+        }
+        
+        keyValuePairs.append(key: newTask, value: taskDate)
+        Storage.inboxData["Today"] = keyValuePairs
+        
         self.tableView.reloadData()
     }
 }
