@@ -49,7 +49,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             tabBarController.tabBar.scrollEdgeAppearance = .init()
         }
         
-        
         // making tabBarController with navController and corresponding view a root controller for window
         window?.rootViewController = tabBarController
     }

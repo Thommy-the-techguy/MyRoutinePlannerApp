@@ -13,7 +13,7 @@ class InboxTabViewController: UIViewController {
     // (day after tommorow) Fri CustomKeyValuePairs -> Tomorrow : CustomKeyValuePairs
     // (day after tommorow) Fri = nil
     
-    var inboxData: [String:CustomKeyValuePairs<String, Date>] = [:]
+//    var inboxData: [String:CustomKeyValuePairs<String, Date>] = [:]
     /*[
         "Today" : CustomKeyValuePairs(arrayOfKeys: ["today1", "today2", "today3"], arrayOfValues: [Date(), Date(), Date()]),
         
@@ -33,9 +33,17 @@ class InboxTabViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewData), name: Notification.Name("TabSwitched"), object: nil)
+        
         setupUI()
         
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
     
     private func setupView() {
@@ -45,9 +53,7 @@ class InboxTabViewController: UIViewController {
         // scroll edge initialization for navBar
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
         
-        
         title = "Inbox"
-        
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
         
@@ -57,6 +63,7 @@ class InboxTabViewController: UIViewController {
     
     private func configureTableView() {
         tableView = UITableView()
+        tableView.backgroundColor = .systemGray6
         tableView.layer.cornerRadius = 20
         
         tableView.dataSource = self
@@ -85,15 +92,15 @@ class InboxTabViewController: UIViewController {
     }
     
     func deleteSectionIfNoActivities(sectionIndex: Int) {
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sectionIndex]
         
         print("called", currentKey)
-        print("\(String(describing: self.inboxData[currentKey]?.count))")
+        print("\(String(describing: Storage.inboxData[currentKey]?.count))")
         
-        if self.inboxData[currentKey]?.count == 0 {
+        if Storage.inboxData[currentKey]?.count == 0 {
             self.tableView.deleteSections(IndexSet(integer: sectionIndex), with: .left)
-            self.inboxData[currentKey] = nil
+            Storage.inboxData[currentKey] = nil
         }
     }
     
@@ -131,12 +138,12 @@ extension InboxTabViewController: UITableViewDragDelegate {
         let rowIndex = indexPath.row
         
         
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
         
         let dragItem = UIDragItem(itemProvider: NSItemProvider())
-        dragItem.localObject = self.inboxData[currentKey]?.getKeyAndValue(for: rowIndex)
+        dragItem.localObject = Storage.inboxData[currentKey]?.getKeyAndValue(for: rowIndex)
         
         
         return [dragItem]
@@ -146,14 +153,14 @@ extension InboxTabViewController: UITableViewDragDelegate {
 
 extension InboxTabViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return self.inboxData.count
+        return Storage.inboxData.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
-        return (self.inboxData[currentKey]?.count)!
+        return (Storage.inboxData[currentKey]?.count)!
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -166,10 +173,10 @@ extension InboxTabViewController: UITableViewDataSource {
         let section = indexPath.section
         let indexOfCell = indexPath.row
         
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
-        let message = self.inboxData[currentKey]?.getKey(for: indexOfCell)
-        let date = self.inboxData[currentKey]?.getValue(for: indexOfCell)
+        let message = Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
+        let date = Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
         
         // MARK: - maybe not even necessary
         if let message, let date {
@@ -181,7 +188,7 @@ extension InboxTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
         return currentKey
@@ -193,12 +200,12 @@ extension InboxTabViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let arrayOfDataDictKeys = Array(self.inboxData.keys)
+            let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
             let currentKey: String = arrayOfDataDictKeys[indexPath.section]
             
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            self.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
             deleteSectionIfNoActivities(sectionIndex: indexPath.section)
             tableView.endUpdates()
             
@@ -220,31 +227,31 @@ extension InboxTabViewController: UITableViewDataSource {
         let destinationRowIndex = destinationIndexPath.row
         
         
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sourceSection]
         let destinationKey: String = arrayOfDataDictKeys[destinationSection]
         
         
         if sourceSection != destinationSection {
-            var keyAndValueToAppend = self.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
+            var keyAndValueToAppend = Storage.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
             
             // MARK: - force unwrapping?
-            let destinationDate = self.inboxData[destinationKey]?.getValue(for: 0)
+            let destinationDate = Storage.inboxData[destinationKey]?.getValue(for: 0)
             
             let dateComponents = Calendar.current.dateComponents([.day, .month, .year], from: destinationDate!)
             
             keyAndValueToAppend?.value = Calendar.current.date(from: dateComponents)!
             
             
-            self.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!)
-            self.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
+            Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!)
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
         } else {
-            let temp = self.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
-            let destinationKeyAndValue = self.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
+            let temp = Storage.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
+            let destinationKeyAndValue = Storage.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
             
             
-            self.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
-            self.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
+            Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
+            Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
         }
         
         
@@ -278,16 +285,16 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         
-        let arrayOfDataDictKeys = Array(self.inboxData.keys)
+        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[indexPath.section]
         
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
-        self.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
+        Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
         deleteSectionIfNoActivities(sectionIndex: indexPath.section)
         self.tableView.endUpdates()
         
-        print(inboxData)
+        print(Storage.inboxData)
     }
 }
 
@@ -316,8 +323,8 @@ extension InboxTabViewController: AddActivityDelegate {
                 print(keyToInsert)
         }
         
-        guard var keyValuePairs = self.inboxData[keyToInsert] else {
-            self.inboxData[keyToInsert] = CustomKeyValuePairs(
+        guard var keyValuePairs = Storage.inboxData[keyToInsert] else {
+            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
                 arrayOfKeys: [newTask],
                 arrayOfValues: [taskDate]
             )
@@ -328,8 +335,14 @@ extension InboxTabViewController: AddActivityDelegate {
         }
         
         keyValuePairs.append(key: newTask, value: taskDate)
-        self.inboxData[keyToInsert] = keyValuePairs
+        Storage.inboxData[keyToInsert] = keyValuePairs
         
         self.tableView.reloadData()
+    }
+}
+
+extension InboxTabViewController: TabSwitchProtocol {
+    func notifyWhenTabIsSwitched() {
+        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
 }

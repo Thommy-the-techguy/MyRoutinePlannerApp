@@ -41,6 +41,7 @@ class TodayTabViewController: UIViewController {
 //        
 //        // add notification observer for terminating app
 //        NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewData), name: Notification.Name("TabSwitched"), object: nil)
         
         // setting view's background color
         view.backgroundColor = .systemGray6
@@ -61,6 +62,11 @@ class TodayTabViewController: UIViewController {
         configureTableView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
+    }
 
     /*
     // MARK: - Navigation
@@ -103,34 +109,7 @@ class TodayTabViewController: UIViewController {
         newActivityNavigationController.modalPresentationStyle = .formSheet
         present(newActivityNavigationController, animated: true)
     }
-    
-    
-//    // process app termination
-//    @objc private func saveData() {
-//        let encoder = JSONEncoder()
-//        if let encoded = try? encoder.encode(self.newDataWithDate) {
-//            UserDefaults.standard.set(encoded, forKey: "TodayTasks")
-//            print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
-//        } else {
-//            print("An encoding error has ocurred!")
-//        }
-//    }
-//    
-//    // process readingSavedData when scene will load
-//    @objc func readData() {
-//        if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
-//            let decoder = JSONDecoder()
-//            if let loadedData = try? decoder.decode(CustomKeyValuePairs<String, Date>.self, from: savedData) {
-//                self.newDataWithDate = loadedData
-//                
-//                self.tableView.reloadData()
-//                
-//                print("data has been loaded.")
-//            }
-//        }
-//    }
-    
-    
+        
     
     // share note functionality
     
@@ -159,8 +138,6 @@ extension TodayTabViewController: UITableViewDataSource {
         cell.delegate = self
         
         cell.backgroundColor = .white
-//        cell.setText(newDataWithDate.getKey(for: indexPath.row))
-//        cell.setDate(newDataWithDate.getValue(for: indexPath.row))
         
         cell.setText((Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
         cell.setDate((Storage.inboxData["Today"]?.getValue(for: indexPath.row))!)
@@ -178,7 +155,6 @@ extension TodayTabViewController: UITableViewDataSource {
         if editingStyle == .delete {
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
-//            newDataWithDate.removeKeyAndValue(for: indexPath.row)
             Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
             tableView.endUpdates()
     
@@ -195,11 +171,6 @@ extension TodayTabViewController: UITableViewDataSource {
     
     // swapping two items with drag and drop
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-//        let temp = newDataWithDate.getKeyAndValue(for: sourceIndexPath.row)
-//        newDataWithDate.setKeyAndValue(for: sourceIndexPath.row, key: newDataWithDate.getKey(for: destinationIndexPath.row), value: newDataWithDate.getValue(for: destinationIndexPath.row))
-//        newDataWithDate.setKeyAndValue(for: destinationIndexPath.row, key: temp.key, value: temp.value)
-        let sourceSection = sourceIndexPath.section
-        let destinationSection = destinationIndexPath.section
         
         let sourceRowIndex = sourceIndexPath.row
         let destinationRowIndex = destinationIndexPath.row
@@ -274,5 +245,11 @@ extension TodayTabViewController: AddActivityDelegate {
         Storage.inboxData["Today"] = keyValuePairs
         
         self.tableView.reloadData()
+    }
+}
+
+extension TodayTabViewController: TabSwitchProtocol {
+    func notifyWhenTabIsSwitched() {
+        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
 }
