@@ -10,25 +10,7 @@ import UIKit
 class TodayTabViewController: UIViewController {
     
     var tableView: UITableView! = nil
-//    let storage = Storage()
-//    var newDataWithDate = Storage.inboxData["Today"] ?? CustomKeyValuePairs()
-//    var newDataWithDate: CustomKeyValuePairs<String, Date> = CustomKeyValuePairs()
-    /*CustomKeyValuePairs(
-        arrayOfKeys: [
-            "marsoiuewirjwlkfjdslkfjls jkfjsljfiuweroiwejlf sjdlfj ksdjrieuwor jlksdj flwuero jdsfj flwueroi uwsdkjfluweor jflsdjf weuirwerjlkfsjd oiwerj lsdjf uwioerj fsdlkjf uoiewr ",
-                      "earth",
-                      "jupiter",
-                      "venus",
-                      "saturn"
-        ],
-        arrayOfValues: [
-            Date(),
-            Calendar.current.date(byAdding: .day, value: 1, to: Date())!,
-            Calendar.current.date(byAdding: .day, value: 2, to: Date())!,
-            Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
-            Calendar.current.date(byAdding: .day, value: 4, to: Date())!
-        ]
-    )*/
+
     var activityViewController: UIActivityViewController?
     var selectedRowIndexPath: IndexPath?
 
@@ -36,11 +18,6 @@ class TodayTabViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-//        // add notification observer for starting app
-//        NotificationCenter.default.addObserver(self, selector: #selector(readData), name: Notification.Name("AppLoaded"), object: nil)
-//        
-//        // add notification observer for terminating app
-//        NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewData), name: Notification.Name("TabSwitched"), object: nil)
         
         // setting view's background color
@@ -201,7 +178,6 @@ extension TodayTabViewController: UITableViewDataSource {
 extension TodayTabViewController: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         let dragItem = UIDragItem(itemProvider: NSItemProvider())
-//        dragItem.localObject = newDataWithDate.getKey(for: indexPath.row)
         dragItem.localObject = Storage.inboxData["Today"]?.getKey(for: indexPath.row)
         return [dragItem]
     }
@@ -219,7 +195,6 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
-//        self.newDataWithDate.removeKeyAndValue(for: indexPath.row)
         Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
         self.tableView.endUpdates()
         
@@ -229,7 +204,6 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
 
 extension TodayTabViewController: AddActivityDelegate {
     func saveNewTask(_ newTask: String, taskDate: Date) {
-//        self.newDataWithDate.append(key: newTask, value: taskDate)
         guard var keyValuePairs = Storage.inboxData["Today"] else {
             Storage.inboxData["Today"] = CustomKeyValuePairs(
                 arrayOfKeys: [newTask],
@@ -245,11 +219,5 @@ extension TodayTabViewController: AddActivityDelegate {
         Storage.inboxData["Today"] = keyValuePairs
         
         self.tableView.reloadData()
-    }
-}
-
-extension TodayTabViewController: TabSwitchProtocol {
-    func notifyWhenTabIsSwitched() {
-        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
 }

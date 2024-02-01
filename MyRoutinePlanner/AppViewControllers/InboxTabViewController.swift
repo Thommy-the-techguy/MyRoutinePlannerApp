@@ -13,17 +13,6 @@ class InboxTabViewController: UIViewController {
     // (day after tommorow) Fri CustomKeyValuePairs -> Tomorrow : CustomKeyValuePairs
     // (day after tommorow) Fri = nil
     
-//    var inboxData: [String:CustomKeyValuePairs<String, Date>] = [:]
-    /*[
-        "Today" : CustomKeyValuePairs(arrayOfKeys: ["today1", "today2", "today3"], arrayOfValues: [Date(), Date(), Date()]),
-        
-        "Tomorrow" : CustomKeyValuePairs(arrayOfKeys: ["tomorrow1", "tomorrow2", "tomorrow3", "tomorrow4", "tomorrow5"], arrayOfValues: [
-            Calendar.current.date(byAdding: .day, value: 1, to: Date())!, Calendar.current.date(byAdding: .day, value: 1, to: Date())!, Calendar.current.date(byAdding: .day, value: 1, to: Date())!, Calendar.current.date(byAdding: .day, value: 1, to: Date())!, Calendar.current.date(byAdding: .day, value: 1, to: Date())!]),
-        
-        "Fri" : CustomKeyValuePairs(arrayOfKeys: ["26 smth1", "26 smth2", "26 smth3", "26 smth4"], arrayOfValues: [
-            Calendar.current.date(byAdding: .day, value: 2, to: Date())!, Calendar.current.date(byAdding: .day, value: 2, to: Date())!, Calendar.current.date(byAdding: .day, value: 2, to: Date())!, Calendar.current.date(byAdding: .day, value: 2, to: Date())!])
-    ]*/
-    
     var tableView: UITableView!
     var activityViewController: UIActivityViewController?
     var selectedRowIndexPath: IndexPath?
@@ -338,11 +327,5 @@ extension InboxTabViewController: AddActivityDelegate {
         Storage.inboxData[keyToInsert] = keyValuePairs
         
         self.tableView.reloadData()
-    }
-}
-
-extension InboxTabViewController: TabSwitchProtocol {
-    func notifyWhenTabIsSwitched() {
-        NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
 }
