@@ -7,7 +7,7 @@
 
 import UIKit
 
-class Storage: NSObject {
+final class Storage: NSObject {
     static var inboxData: [String:CustomKeyValuePairs<String, Date>] = [:]
     
     override init() {
@@ -18,6 +18,71 @@ class Storage: NSObject {
         
         // add notification observer for terminating app
         NotificationCenter.default.addObserver(self, selector: #selector(saveData), name: Notification.Name("AppAboutToTerminate"), object: nil)
+    }
+    
+    private func checkIfTaskIsValidByDate(_ date: Date) -> Bool {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .none
+        dateFormatter.dateStyle = .full
+        
+        let dateInString = dateFormatter.string(from: date)
+        let todayDateInString = dateFormatter.string(from: Date())
+        
+        let dateWithoutTime = dateFormatter.date(from: dateInString)!
+        let todayDateWithoutTime = dateFormatter.date(from: todayDateInString)!
+        
+        if dateWithoutTime < todayDateWithoutTime {
+            return false
+        }
+        
+        return true
+    }
+    
+    private func removeInvalidTasks() {
+        let todayTasks = Storage.inboxData["Today"]
+        let tomorrowTasks = Storage.inboxData["Tomorrow"]
+        
+        
+        if let todayTasks, let _ = tomorrowTasks {
+            if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
+                moveTommorowToToday()
+                return
+            }
+        } else if let todayTasks {
+            if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
+                removeTodayTasks()
+                return
+            }
+        } else {
+            return
+        }
+    }
+    
+    public func removeTodayTasks() {
+        Storage.inboxData["Today"] = nil
+    }
+    
+    private func moveTommorowToToday() {
+        Storage.inboxData["Today"] = Storage.inboxData["Tomorrow"]
+        
+        let (dayAfterTomorrowIsPresent, tomorrowDateKey) = checkIfDayAfterTomorrowIsPresent()
+        if dayAfterTomorrowIsPresent {
+            Storage.inboxData["Tomorrow"] = Storage.inboxData[tomorrowDateKey]
+            Storage.inboxData[tomorrowDateKey] = nil
+        } else {
+            Storage.inboxData["Tomorrow"] = nil
+        }
+    }
+    
+    private func checkIfDayAfterTomorrowIsPresent() -> (isPresent: Bool, tomorrowDateKey: String) {
+        let tomorrowDate = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .none
+        dateFormatter.dateStyle = .full
+        
+        let tomorrowDateString = dateFormatter.string(from: tomorrowDate)
+        
+        return (isPresent: Storage.inboxData[tomorrowDateString] != nil, tomorrowDateKey: tomorrowDateString)
     }
     
     // process app termination
@@ -40,10 +105,12 @@ class Storage: NSObject {
             if let loadedData = try? decoder.decode([String:CustomKeyValuePairs<String, Date>].self, from: savedData) {
                 Storage.inboxData = loadedData
                 
-//                self.tableView.reloadData()
                 
                 print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
             }
         }
+        
+        print("REMOVING INVALID TASKS")
+        removeInvalidTasks()
     }
 }

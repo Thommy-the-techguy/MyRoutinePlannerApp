@@ -76,6 +76,15 @@ class TodayTabViewController: UIViewController {
             self.tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
         ])
     }
+    
+    func makeValueNilForTodayKeyIfNoActivities() {
+        print("called", "Today")
+        print("\(String(describing: Storage.inboxData["Today"]?.count))")
+        
+        if Storage.inboxData["Today"]?.count == 0 {
+            Storage.inboxData["Today"] = nil
+        }
+    }
 
     // MARK: - #selectors
     
@@ -133,6 +142,7 @@ extension TodayTabViewController: UITableViewDataSource {
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
+            makeValueNilForTodayKeyIfNoActivities()
             tableView.endUpdates()
     
             
@@ -196,6 +206,7 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
+        makeValueNilForTodayKeyIfNoActivities()
         self.tableView.endUpdates()
         
         print(Storage.inboxData["Today"] ?? "nil")

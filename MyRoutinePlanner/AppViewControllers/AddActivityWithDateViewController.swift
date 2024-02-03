@@ -17,6 +17,7 @@ class AddActivityWithDateViewController: UIViewController {
         let configuredDatePicker = UIDatePicker()
         configuredDatePicker.minimumDate = Date()
         configuredDatePicker.date = Date()
+        configuredDatePicker.datePickerMode = .date
         if #available(iOS 14.0, *) {
             configuredDatePicker.preferredDatePickerStyle = .inline
         } else {
