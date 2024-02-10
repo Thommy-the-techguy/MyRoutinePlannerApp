@@ -33,9 +33,38 @@ class AddActivityWithDateViewController: UIViewController {
     
     var textView: UITextView!
     
-    weak var delegate: AddActivityDelegate?
+    var initialText: String?
     
+    var initialTitle: String?
+    
+    weak var delegate: AddActivityDelegate?
 
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String) {
+        self.initialText = initialTextViewText
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String, initialDate: Date) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.datePicker.date = initialDate
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -55,10 +84,15 @@ class AddActivityWithDateViewController: UIViewController {
         
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(closeView))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addNewTask))
+        
+        if initialTitle == "Edit Task" {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTask))
+        } else {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addNewTask))
+        }
         
         
-        title = "Add Activity"
+        title = (self.initialTitle == nil ? "Add Activity" : self.initialTitle)
         
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
@@ -69,8 +103,8 @@ class AddActivityWithDateViewController: UIViewController {
     private func configureTextView() {
         textView = UITextView()
         
-        textView.text = placeholderText
-        textView.textColor = .lightGray
+        textView.text = (self.initialText == nil ? placeholderText : self.initialText)
+        textView.textColor = (self.initialText == nil ? .lightGray : .black)
         textView.font = .systemFont(ofSize: 21)
         textView.layer.cornerRadius = 10.0
         textView.delegate = self
@@ -134,7 +168,6 @@ class AddActivityWithDateViewController: UIViewController {
         ])
     }
     
-    
     // MARK: - #selectors
     
     
@@ -156,6 +189,20 @@ class AddActivityWithDateViewController: UIViewController {
             dismiss(animated: true)
         }
     }
+    
+    @objc private func editTask() {
+        // TODO: add new task logic
+        let alertController = UIAlertController(title: "Error", message: "You have to write something first in order to save it!", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
+        
+        if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
+            self.present(alertController, animated: true)
+        } else {
+            delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date)
+            dismiss(animated: true)
+        }
+    }
+
 
     @objc func keyboardWillShow(notification: NSNotification) {
         guard let keyboardSize =

@@ -42,23 +42,47 @@ final class Storage: NSObject {
         let todayTasks = Storage.inboxData["Today"]
         let tomorrowTasks = Storage.inboxData["Tomorrow"]
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .full
+        dateFormatter.timeStyle = .none
         
-        if let todayTasks, let _ = tomorrowTasks {
-            if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
+        let dayAfterTomorrow = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!
+        let dayAfterTomorrowInString = dateFormatter.string(from: dayAfterTomorrow)
+        
+        let dayAfterTomorrowTasks = Storage.inboxData[dayAfterTomorrowInString]
+        
+        if let todayTasks {
+            if let tomorrowTasks {
+                if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
+                    moveTommorowToToday()
+                    return
+                }
+            } else {
+                if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
+                    removeTodayTasks()
+                    return
+                }
+            }
+            
+        } else if let tomorrowTasks {
+            let todayDateInString = dateFormatter.string(from: Date())
+            let todayDateWithoutTime = dateFormatter.date(from: todayDateInString)
+            
+            let tomorrowDateInString = dateFormatter.string(from: tomorrowTasks.getValue(for: 0))
+            let tomorrowDateWithoutTime = dateFormatter.date(from: tomorrowDateInString)
+            
+            
+            if todayTasks == nil && tomorrowDateWithoutTime == todayDateWithoutTime {
                 moveTommorowToToday()
                 return
             }
-        } else if let todayTasks {
-            if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
-                removeTodayTasks()
-                return
-            }
-        } else {
+        } else if let dayAfterTomorrowTasks {
+            moveTommorowToToday()
             return
         }
     }
     
-    public func removeTodayTasks() {
+    private func removeTodayTasks() {
         Storage.inboxData["Today"] = nil
     }
     

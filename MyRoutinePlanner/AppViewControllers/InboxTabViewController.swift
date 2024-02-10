@@ -85,11 +85,13 @@ class InboxTabViewController: UIViewController {
         let currentKey: String = arrayOfDataDictKeys[sectionIndex]
         
         print("called", currentKey)
-        print("\(String(describing: Storage.inboxData[currentKey]?.count))")
+        print("Section Index To Remove\(String(describing: Storage.inboxData[currentKey]?.count))")
         
         if Storage.inboxData[currentKey]?.count == 0 {
-            self.tableView.deleteSections(IndexSet(integer: sectionIndex), with: .left)
             Storage.inboxData[currentKey] = nil
+            self.tableView.beginUpdates()
+            self.tableView.deleteSections([sectionIndex], with: .left)
+            self.tableView.endUpdates()
         }
     }
     
@@ -188,19 +190,45 @@ extension InboxTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
+
+    }
+    
+    private func openEditView(initialTextViewText: String, initialDate: Date) {
+        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialDate: initialDate)
+        editActivityVC.delegate = self
+        let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
+        editActivityNavigationController.modalPresentationStyle = .formSheet
+        present(editActivityNavigationController, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { (contextualAction, view, boolValue) in
+            let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+            let currentKey: String = arrayOfDataDictKeys[indexPath.section]
+            
+            self.selectedRowIndexPath = indexPath
+            
+            let (initialText, initialDate) = (Storage.inboxData[currentKey]?.getKeyAndValue(for: indexPath.row))!
+            
+            self.openEditView(initialTextViewText: initialText, initialDate: initialDate)
+        })
+        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { (contextualAction, view, boolValue) in
             let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
             let currentKey: String = arrayOfDataDictKeys[indexPath.section]
             
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
-            deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+            self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
             tableView.endUpdates()
             
             
-            reloadDataWithDelay(0.3)
-        }
+            self.reloadDataWithDelay(0.3)
+        })
+
+        let swipeActions = UISwipeActionsConfiguration(actions: [editButton, deleteButton])
+        
+        return swipeActions
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -234,6 +262,17 @@ extension InboxTabViewController: UITableViewDataSource {
             
             Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
+            
+//            self.tableView.performBatchUpdates({ () in
+//                self.tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+//                deleteSectionIfNoActivities(sectionIndex: sourceSection)
+//                tableView.reloadData()
+//            })
+//            self.tableView.beginUpdates()
+//            
+//            self.tableView.endUpdates()
+            
+            
         } else {
             let temp = Storage.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
             let destinationKeyAndValue = Storage.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
@@ -241,13 +280,27 @@ extension InboxTabViewController: UITableViewDataSource {
             
             Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
             Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
+            
+            
+//            self.tableView.performBatchUpdates({ () in
+//                self.tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+//                tableView.reloadData()
+//            })
+//            self.tableView.beginUpdates()
+//
+//            self.tableView.endUpdates()
         }
         
-        
-        deleteSectionIfNoActivities(sectionIndex: sourceSection)
-        
         // TODO: - maybe do it with delay
-        tableView.reloadData()
+        self.tableView.performBatchUpdates({ () in
+//            deleteSectionIfNoActivities(sectionIndex: sourceSection)
+            tableView.reloadData()
+        })
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.deleteSectionIfNoActivities(sectionIndex: sourceSection)
+            self.tableView.reloadData()
+        }
     }
     
     @objc func reloadTableViewData() {
@@ -280,8 +333,13 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
-        deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+//        deleteSectionIfNoActivities(sectionIndex: indexPath.section)
         self.tableView.endUpdates()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+            self.tableView.reloadData()
+        }
         
         print(Storage.inboxData)
     }
@@ -289,6 +347,89 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
 
 
 extension InboxTabViewController: AddActivityDelegate {
+    func editSelectedTask(taskText: String, taskDate: Date) {
+        let sectionIndex = (self.selectedRowIndexPath?.section)!
+        print(sectionIndex)
+        var arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let currentKey: String = arrayOfDataDictKeys[sectionIndex]
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .full
+        dateFormatter.timeStyle = .none
+        
+        let tomorrowDate = Calendar.current.date(byAdding: DateComponents.init(day: 1), to: Date())!
+        
+        let tomorrowDateInString = dateFormatter.string(from: tomorrowDate)
+        let taskDateInString = dateFormatter.string(from: taskDate)
+        let todayDateInString = dateFormatter.string(from: Date())
+        let currentDateInString = dateFormatter.string(from: (Storage.inboxData[currentKey]?.getValue(for: 0))!)
+        
+        
+        // TODO: here
+        if taskText == Storage.inboxData[currentKey]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == currentDateInString {
+            return
+        }
+        
+        
+        
+        var key: String
+        switch taskDateInString {
+            case todayDateInString:
+                key = "Today"
+                print(key)
+            case tomorrowDateInString:
+                key = "Tomorrow"
+                print(key)
+            default:
+                key = taskDateInString
+                print(key)
+        }
+        
+        
+        guard var taskDateKeyValuePairs = Storage.inboxData[key] else {
+            
+            
+            Storage.inboxData[key] = CustomKeyValuePairs(
+                arrayOfKeys: [taskText],
+                arrayOfValues: [taskDate]
+            )
+            
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            
+            arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+            
+            
+            self.tableView.reloadData()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.deleteSectionIfNoActivities(sectionIndex: sectionIndex)
+                self.tableView.reloadData()
+            }
+            
+            return
+        }
+        
+        
+        print("\n\n\nhere\n\n\n")
+        if taskDateInString != currentDateInString {
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            Storage.inboxData[key]?.append(key: taskText, value: taskDate)
+            
+            
+        } else if taskDateInString == currentDateInString {
+            Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate)
+        }
+
+        
+        self.tableView.reloadData()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.deleteSectionIfNoActivities(sectionIndex: sectionIndex)
+            self.tableView.reloadData()
+        }
+    }
+    
     func saveNewTask(_ newTask: String, taskDate: Date) {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .none
@@ -298,7 +439,7 @@ extension InboxTabViewController: AddActivityDelegate {
         let todayDateStringRepresentation = dateFormatter.string(from: Date())
         let tomorrowDateStringRepresentation = dateFormatter.string(from: Calendar.current.date(byAdding: DateComponents.init(day: 1), to: Date())!)
         
-//        print("tdsr: \(taskDateStringRepresentation)")
+        
         var keyToInsert: String
         switch taskDateStringRepresentation {
             case todayDateStringRepresentation:
@@ -312,6 +453,7 @@ extension InboxTabViewController: AddActivityDelegate {
                 print(keyToInsert)
         }
         
+        
         guard var keyValuePairs = Storage.inboxData[keyToInsert] else {
             Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
                 arrayOfKeys: [newTask],
@@ -323,8 +465,9 @@ extension InboxTabViewController: AddActivityDelegate {
             return
         }
         
-        keyValuePairs.append(key: newTask, value: taskDate)
-        Storage.inboxData[keyToInsert] = keyValuePairs
+
+        Storage.inboxData[keyToInsert]?.append(key: newTask, value: taskDate)
+
         
         self.tableView.reloadData()
     }

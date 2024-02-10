@@ -138,17 +138,47 @@ extension TodayTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
+//        if editingStyle == .delete {
+//            tableView.beginUpdates()
+//            tableView.deleteRows(at: [indexPath], with: .automatic)
+//            Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
+//            makeValueNilForTodayKeyIfNoActivities()
+//            tableView.endUpdates()
+//    
+//            
+//            reloadDataWithDelay(0.3)
+//            print(Storage.inboxData["Today"] as Any)
+//        }
+    }
+    
+    private func openEditView(initialTextViewText: String) {
+        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task")
+        editActivityVC.delegate = self
+        let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
+        editActivityNavigationController.modalPresentationStyle = .formSheet
+        present(editActivityNavigationController, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { (contextualAction, view, boolValue) in
+            self.selectedRowIndexPath = indexPath
+            self.openEditView(initialTextViewText: (Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
+        })
+        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { (contextualAction, view, boolValue) in
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
-            makeValueNilForTodayKeyIfNoActivities()
+            self.makeValueNilForTodayKeyIfNoActivities()
             tableView.endUpdates()
     
             
-            reloadDataWithDelay(0.3)
+            self.reloadDataWithDelay(0.3)
             print(Storage.inboxData["Today"] as Any)
-        }
+        })
+
+        let swipeActions = UISwipeActionsConfiguration(actions: [editButton, deleteButton])
+        
+        return swipeActions
     }
     
     // allows to dragAndDrop selected tableCell
@@ -228,6 +258,66 @@ extension TodayTabViewController: AddActivityDelegate {
         
         keyValuePairs.append(key: newTask, value: taskDate)
         Storage.inboxData["Today"] = keyValuePairs
+        
+        self.tableView.reloadData()
+    }
+    
+    func editSelectedTask(taskText: String, taskDate: Date) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .full
+        dateFormatter.timeStyle = .none
+        
+        let taskDateInString = dateFormatter.string(from: taskDate)
+        let todayDateInString = dateFormatter.string(from: Date())
+        
+       
+        if taskText == Storage.inboxData["Today"]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == todayDateInString {
+            return
+        }
+        
+        
+        guard var taskDateKeyValuePairs = Storage.inboxData[taskDateInString] else {
+            let tomorrowDate = Calendar.current.date(byAdding: DateComponents.init(day: 1), to: Date())!
+            let tomorrowDateInString = dateFormatter.string(from: tomorrowDate)
+            
+            var key: String
+            
+            switch taskDateInString {
+                case todayDateInString:
+                    key = "Today"
+                    print(key)
+                case tomorrowDateInString:
+                    key = "Tomorrow"
+                    print(key)
+                default:
+                    key = taskDateInString
+                    print(key)
+            }
+            
+            Storage.inboxData[key] = CustomKeyValuePairs(
+                arrayOfKeys: [taskText],
+                arrayOfValues: [taskDate]
+            )
+            
+            Storage.inboxData["Today"]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            
+            makeValueNilForTodayKeyIfNoActivities()
+            
+            self.tableView.reloadData()
+            
+            return
+        }
+        
+        
+        Storage.inboxData["Today"]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+        
+        if taskDateInString != todayDateInString {
+            Storage.inboxData[taskDateInString]?.append(key: taskText, value: taskDate)
+        } else if taskDateInString == todayDateInString {
+            Storage.inboxData["Today"]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate)
+        }
+        
+        makeValueNilForTodayKeyIfNoActivities()
         
         self.tableView.reloadData()
     }
