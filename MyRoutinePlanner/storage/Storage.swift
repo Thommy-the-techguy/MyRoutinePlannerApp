@@ -52,7 +52,7 @@ final class Storage: NSObject {
         let dayAfterTomorrowTasks = Storage.inboxData[dayAfterTomorrowInString]
         
         if let todayTasks {
-            if let tomorrowTasks {
+            if tomorrowTasks != nil {
                 if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
                     moveTommorowToToday()
                     return

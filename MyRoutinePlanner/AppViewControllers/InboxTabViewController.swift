@@ -7,12 +7,7 @@
 
 import UIKit
 
-class InboxTabViewController: UIViewController {
-    // TODO: - maybe create class Storage to share data with today tab and maybe delete old tasks
-    // when today will pass Tomorrow CustomKeyValuePairs -> Today : CustomKeyValuePairs
-    // (day after tommorow) Fri CustomKeyValuePairs -> Tomorrow : CustomKeyValuePairs
-    // (day after tommorow) Fri = nil
-    
+class InboxTabViewController: UIViewController {    
     var tableView: UITableView!
     var activityViewController: UIActivityViewController?
     var selectedRowIndexPath: IndexPath?
@@ -263,16 +258,6 @@ extension InboxTabViewController: UITableViewDataSource {
             Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
             
-//            self.tableView.performBatchUpdates({ () in
-//                self.tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
-//                deleteSectionIfNoActivities(sectionIndex: sourceSection)
-//                tableView.reloadData()
-//            })
-//            self.tableView.beginUpdates()
-//            
-//            self.tableView.endUpdates()
-            
-            
         } else {
             let temp = Storage.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
             let destinationKeyAndValue = Storage.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
@@ -281,19 +266,10 @@ extension InboxTabViewController: UITableViewDataSource {
             Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
             Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
             
-            
-//            self.tableView.performBatchUpdates({ () in
-//                self.tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
-//                tableView.reloadData()
-//            })
-//            self.tableView.beginUpdates()
-//
-//            self.tableView.endUpdates()
         }
         
         // TODO: - maybe do it with delay
         self.tableView.performBatchUpdates({ () in
-//            deleteSectionIfNoActivities(sectionIndex: sourceSection)
             tableView.reloadData()
         })
         
@@ -333,7 +309,6 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
-//        deleteSectionIfNoActivities(sectionIndex: indexPath.section)
         self.tableView.endUpdates()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -455,7 +430,7 @@ extension InboxTabViewController: AddActivityDelegate {
         }
         
         
-        guard var keyValuePairs = Storage.inboxData[keyToInsert] else {
+        guard Storage.inboxData[keyToInsert] != nil else {
             Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
                 arrayOfKeys: [newTask],
                 arrayOfValues: [taskDate]
