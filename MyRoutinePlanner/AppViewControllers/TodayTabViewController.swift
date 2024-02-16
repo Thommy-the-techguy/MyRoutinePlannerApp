@@ -270,31 +270,31 @@ extension TodayTabViewController: AddActivityDelegate {
         let taskDateInString = dateFormatter.string(from: taskDate)
         let todayDateInString = dateFormatter.string(from: Date())
         
+        let tomorrowDate = Calendar.current.date(byAdding: DateComponents.init(day: 1), to: Date())!
+        let tomorrowDateInString = dateFormatter.string(from: tomorrowDate)
+        
        
         if taskText == Storage.inboxData["Today"]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == todayDateInString {
             return
         }
         
+        var keyToInsert: String
         
-        guard var taskDateKeyValuePairs = Storage.inboxData[taskDateInString] else {
-            let tomorrowDate = Calendar.current.date(byAdding: DateComponents.init(day: 1), to: Date())!
-            let tomorrowDateInString = dateFormatter.string(from: tomorrowDate)
-            
-            var key: String
-            
-            switch taskDateInString {
-                case todayDateInString:
-                    key = "Today"
-                    print(key)
-                case tomorrowDateInString:
-                    key = "Tomorrow"
-                    print(key)
-                default:
-                    key = taskDateInString
-                    print(key)
-            }
-            
-            Storage.inboxData[key] = CustomKeyValuePairs(
+        switch taskDateInString {
+            case todayDateInString:
+                keyToInsert = "Today"
+                print(keyToInsert)
+            case tomorrowDateInString:
+                keyToInsert = "Tomorrow"
+                print(keyToInsert)
+            default:
+                keyToInsert = taskDateInString
+                print(keyToInsert)
+        }
+        
+        print("Passed")
+        guard var taskDateKeyValuePairs = Storage.inboxData[keyToInsert] else {
+            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
                 arrayOfKeys: [taskText],
                 arrayOfValues: [taskDate]
             )
@@ -308,13 +308,13 @@ extension TodayTabViewController: AddActivityDelegate {
             return
         }
         
-        
-        Storage.inboxData["Today"]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+        let selectedRowIndex = (self.selectedRowIndexPath?.row)!
+        Storage.inboxData["Today"]?.removeKeyAndValue(for: selectedRowIndex)
         
         if taskDateInString != todayDateInString {
             Storage.inboxData[taskDateInString]?.append(key: taskText, value: taskDate)
         } else if taskDateInString == todayDateInString {
-            Storage.inboxData["Today"]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate)
+            Storage.inboxData["Today"]?.insert(at: selectedRowIndex, key: taskText, value: taskDate)
         }
         
         makeValueNilForTodayKeyIfNoActivities()

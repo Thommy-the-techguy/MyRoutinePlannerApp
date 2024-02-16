@@ -352,6 +352,7 @@ extension InboxTabViewController: AddActivityDelegate {
         print(sectionIndex)
         var arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sectionIndex]
+        print("current key: \(currentKey)")
         
         
         let dateFormatter = DateFormatter()
@@ -372,8 +373,8 @@ extension InboxTabViewController: AddActivityDelegate {
         }
         
         
-        
         var key: String
+        
         switch taskDateInString {
             case todayDateInString:
                 key = "Today"
@@ -387,9 +388,7 @@ extension InboxTabViewController: AddActivityDelegate {
         }
         
         
-        guard var taskDateKeyValuePairs = Storage.inboxData[key] else {
-            
-            
+        guard Storage.inboxData[key] != nil else {
             Storage.inboxData[key] = CustomKeyValuePairs(
                 arrayOfKeys: [taskText],
                 arrayOfValues: [taskDate]
@@ -397,13 +396,16 @@ extension InboxTabViewController: AddActivityDelegate {
             
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
             
+            // updating arrayOfDataDictKeys
             arrayOfDataDictKeys = Array(Storage.inboxData.keys)
             
+            let updatedSectionIndex = arrayOfDataDictKeys.firstIndex(of: currentKey)!
             
             self.tableView.reloadData()
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.deleteSectionIfNoActivities(sectionIndex: sectionIndex)
+                print("should remove section \(sectionIndex)\nupdated section index: \(updatedSectionIndex)")
+                self.deleteSectionIfNoActivities(sectionIndex: updatedSectionIndex)
                 self.tableView.reloadData()
             }
             
@@ -412,19 +414,18 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         print("\n\n\nhere\n\n\n")
+        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+        
         if taskDateInString != currentDateInString {
-            Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
             Storage.inboxData[key]?.append(key: taskText, value: taskDate)
-            
-            
         } else if taskDateInString == currentDateInString {
             Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate)
         }
-
         
         self.tableView.reloadData()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            print("should remove section with index \(sectionIndex)")
             self.deleteSectionIfNoActivities(sectionIndex: sectionIndex)
             self.tableView.reloadData()
         }
