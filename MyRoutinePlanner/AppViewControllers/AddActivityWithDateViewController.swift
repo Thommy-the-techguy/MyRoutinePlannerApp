@@ -364,7 +364,8 @@ class AddActivityWithDateViewController: UIViewController {
             dateFormatter.dateStyle = .short
             dateFormatter.timeStyle = .short
             
-            let stringDate = dateFormatter.string(from: self.timePicker.date)
+            let stringDate = dateFormatter.string(from: self.datePicker.date)
+            let stringTime = dateFormatter.string(from: self.timePicker.date)
             
             print("stringDate: \(stringDate)")
             
@@ -374,7 +375,7 @@ class AddActivityWithDateViewController: UIViewController {
             let month: Int = Int(dateComponents[1])!
             let year: Int = Int(dateComponents[2])!
             
-            let timeComponents: [Substring] = (stringDate.split(separator: ",").last?.split(separator: ":"))!
+            let timeComponents: [Substring] = (stringTime.split(separator: ",").last?.split(separator: ":"))!
             
             let hour = Int(timeComponents[0].trimmingCharacters(in: .whitespaces))!
             let minute = Int(timeComponents[1])!
@@ -432,6 +433,7 @@ class AddActivityWithDateViewController: UIViewController {
             self.present(alertController, animated: true)
         } else {
             delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date, withReminder: withReminder)
+            addReminder()
             dismiss(animated: true)
         }
     }

@@ -420,7 +420,7 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         // TODO: here
-        if taskText == Storage.inboxData[currentKey]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == currentDateInString {
+        if taskText == Storage.inboxData[currentKey]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == currentDateInString && withReminder == Storage.inboxData[currentKey]?.getFlag(for: (self.selectedRowIndexPath?.row)!) {
             return
         }
         
@@ -478,6 +478,11 @@ extension InboxTabViewController: AddActivityDelegate {
             Storage.inboxData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == currentDateInString {
             Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
+            
+            if withReminder {
+                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
+                cell?.accessoryView?.isHidden = false
+            }
         }
         
         self.tableView.reloadData()

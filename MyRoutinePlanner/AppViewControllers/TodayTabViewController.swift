@@ -8,7 +8,7 @@
 import UIKit
 
 class TodayTabViewController: UIViewController {
-    //TODO: 1) Add reminder when editing + remain switch on when entering editing if reminder was added before
+    //TODO: 1) Add reminder when editing + remain switch on when entering editing if reminder was added before [x]
     //      2) Remove reminder when editing if it was added and switch now is turned off
     //      3) Change reminder date if dragged or edited to another day
     //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages
@@ -356,7 +356,7 @@ extension TodayTabViewController: AddActivityDelegate {
         let tomorrowDateInString = dateFormatter.string(from: tomorrowDate)
         
        
-        if taskText == Storage.inboxData["Today"]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == todayDateInString {
+        if taskText == Storage.inboxData["Today"]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == todayDateInString && withReminder == Storage.inboxData["Today"]?.getFlag(for: (self.selectedRowIndexPath?.row)!){
             return
         }
         
@@ -403,6 +403,11 @@ extension TodayTabViewController: AddActivityDelegate {
             Storage.inboxData[taskDateInString]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == todayDateInString {
             Storage.inboxData["Today"]?.insert(at: selectedRowIndex, key: taskText, value: taskDate, withReminder: withReminder)
+            
+            if withReminder {
+                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
+                cell?.accessoryView?.isHidden = false
+            }
         }
         
         makeValueNilForTodayKeyIfNoActivities()
