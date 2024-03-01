@@ -40,6 +40,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         notificationCenter.add(request)
     }
     
+    func startAlarmCleaningThread() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let group = DispatchGroup()
+            while true {
+                print("Cleaning delivered reminders")
+                group.enter()
+                
+                self.storage.removeInvalidReminders()
+                
+                group.leave()
+                group.wait()
+                
+//                if self.storage.shouldRemoveReminders {
+//                    print("True branch: \(self.storage.shouldRemoveReminders)")
+////                    self.postReloadDataNotification()
+//                } else {
+//                    print("False branch: \(self.storage.shouldRemoveReminders)")
+//                }
+                
+                sleep(5) // time in seconds
+            }
+        }
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
@@ -52,6 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Permission for push notifications denied.")
             }
         }
+        
+        startAlarmCleaningThread()
         
         return true
     }
@@ -73,7 +99,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         NotificationCenter.default.post(Notification(name: Notification.Name("AppAboutToTerminate")))
     }
-    
 //    // register for remote notifications
 //    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 //        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
@@ -86,4 +111,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ////        completionHandler()
 //    }
 }
-

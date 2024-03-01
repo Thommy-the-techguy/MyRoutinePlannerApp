@@ -8,6 +8,11 @@
 import UIKit
 
 class TodayTabViewController: UIViewController {
+    //TODO: 1) Add reminder when editing + remain switch on when entering editing if reminder was added before
+    //      2) Remove reminder when editing if it was added and switch now is turned off
+    //      3) Change reminder date if dragged or edited to another day
+    //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages
+    
     
     var tableView: UITableView! = nil
 
@@ -19,6 +24,8 @@ class TodayTabViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewData), name: Notification.Name("TabSwitched"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewDataAsync), name: Notification.Name("ReloadData"), object: nil)
         
         // setting view's background color
         view.backgroundColor = .systemGray6
@@ -128,9 +135,44 @@ extension TodayTabViewController: UITableViewDataSource {
         cell.setText((Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
         cell.setDate((Storage.inboxData["Today"]?.getValue(for: indexPath.row))!)
         
+        // TODO: set notifications
+        let accessoryButton = UIButton()
+        accessoryButton.frame = CGRect(x: 0, y: 0, width: 20, height: 20) // replace magic constants
+        accessoryButton.setImage(UIImage(systemName: "bell.badge.fill"), for: .normal)
+        accessoryButton.addTarget(self, action: #selector(cancelReminderWithIdentifier(sender: )), for: .touchUpInside)
+        
+        cell.accessoryView = accessoryButton
+        
+        if (Storage.inboxData["Today"]?.getFlag(for: indexPath.row))! {
+            cell.accessoryView?.isHidden = false
+        } else {
+            cell.accessoryView?.isHidden = true
+        }
+        
         
         return cell
     }
+    
+    @objc private func cancelReminderWithIdentifier(sender: UIButton) {
+        let cell = sender.superview as? UICustomTableViewCell
+        let cellText = (cell?.getCellTextLabel().text)!
+        let reminderIdentifier = cellText + "-notification"
+        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+           var identifiers: [String] = []
+           for notification: UNNotificationRequest in notificationRequests {
+               if notification.identifier == reminderIdentifier {
+                  identifiers.append(notification.identifier)
+               }
+           }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
+        
+        Storage.inboxData["Today"]?.setFlag(for: (cell?.indexPath?.row)!, withReminder: false)
+        
+        cell?.accessoryView?.isHidden = true
+    }
+
     
     // makes so the rows can be deleted
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -138,21 +180,11 @@ extension TodayTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            tableView.beginUpdates()
-//            tableView.deleteRows(at: [indexPath], with: .automatic)
-//            Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
-//            makeValueNilForTodayKeyIfNoActivities()
-//            tableView.endUpdates()
-//    
-//            
-//            reloadDataWithDelay(0.3)
-//            print(Storage.inboxData["Today"] as Any)
-//        }
+        
     }
     
-    private func openEditView(initialTextViewText: String) {
-        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task")
+    private func openEditView(initialTextViewText: String, initialFlag: Bool) {
+        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialFlag: initialFlag)
         editActivityVC.delegate = self
         let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
         editActivityNavigationController.modalPresentationStyle = .formSheet
@@ -162,9 +194,16 @@ extension TodayTabViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { (contextualAction, view, boolValue) in
             self.selectedRowIndexPath = indexPath
-            self.openEditView(initialTextViewText: (Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
+            
+            let (textViewText, _, flag) = (Storage.inboxData["Today"]?.getKeyAndValue(for: indexPath.row))!
+            
+            self.openEditView(initialTextViewText: textViewText, initialFlag: flag)
         })
         let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { (contextualAction, view, boolValue) in
+            
+            let cell = tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
+            self.cancelNotification(cell: cell)
+            
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
@@ -197,8 +236,8 @@ extension TodayTabViewController: UITableViewDataSource {
         let destinationKeyAndValue = Storage.inboxData["Today"]?.getKeyAndValue(for: destinationRowIndex)
         
         
-        Storage.inboxData["Today"]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!)
-        Storage.inboxData["Today"]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!)
+        Storage.inboxData["Today"]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: (destinationKeyAndValue?.flag)!)
+        Storage.inboxData["Today"]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: (temp?.flag)!)
         
         
         print(Storage.inboxData["Today"] as Any)
@@ -206,6 +245,12 @@ extension TodayTabViewController: UITableViewDataSource {
     
     @objc func reloadTableViewData() {
         self.tableView.reloadData()
+    }
+    
+    @objc func reloadTableViewDataAsync() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     // MARK: UITableViewDataSource extension #selectors
@@ -233,6 +278,10 @@ extension TodayTabViewController: UITableViewDelegate {
 extension TodayTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
+        
+        let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
+        cancelNotification(cell: cell)
+        
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
@@ -241,28 +290,61 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         
         print(Storage.inboxData["Today"] ?? "nil")
     }
+    
+    func cancelNotification(cell: UICustomTableViewCell) {
+        let cellText = cell.getCellTextLabel().text!
+        let reminderIdentifier = cellText + "-notification"
+        
+        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+           var identifiers: [String] = []
+           for notification: UNNotificationRequest in notificationRequests {
+               if notification.identifier == reminderIdentifier {
+                  identifiers.append(notification.identifier)
+               }
+           }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
+        
+        Storage.inboxData["Today"]?.setFlag(for: (cell.indexPath?.row)!, withReminder: false)
+        
+        cell.accessoryView?.isHidden = true
+    }
 }
 
 extension TodayTabViewController: AddActivityDelegate {
-    func saveNewTask(_ newTask: String, taskDate: Date) {
+    func saveNewTask(_ newTask: String, taskDate: Date, withReminder: Bool) {
         guard var keyValuePairs = Storage.inboxData["Today"] else {
-            Storage.inboxData["Today"] = CustomKeyValuePairs(
+//            Storage.inboxData["Today"] = CustomKeyValuePairs(
+//                arrayOfKeys: [newTask],
+//                arrayOfValues: [taskDate]
+//            )
+            
+            Storage.inboxData["Today"] = KeyValuePairsWithFlag(
                 arrayOfKeys: [newTask],
-                arrayOfValues: [taskDate]
+                arrayOfValues: [taskDate],
+                arrayOfFlags: [withReminder]
             )
+
+            
             
             self.tableView.reloadData()
+            
+            if withReminder {
+                let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0))
+                cell?.accessoryView?.isHidden = false
+            }
             
             return
         }
         
-        keyValuePairs.append(key: newTask, value: taskDate)
+        keyValuePairs.append(key: newTask, value: taskDate, withReminder: withReminder)
         Storage.inboxData["Today"] = keyValuePairs
         
         self.tableView.reloadData()
     }
     
-    func editSelectedTask(taskText: String, taskDate: Date) {
+    func editSelectedTask(taskText: String, taskDate: Date, withReminder: Bool) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .full
         dateFormatter.timeStyle = .none
@@ -293,10 +375,16 @@ extension TodayTabViewController: AddActivityDelegate {
         }
         
         print("Passed")
-        guard var taskDateKeyValuePairs = Storage.inboxData[keyToInsert] else {
-            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
+        guard Storage.inboxData[keyToInsert] != nil else {
+//            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
+//                arrayOfKeys: [taskText],
+//                arrayOfValues: [taskDate]
+//            )
+            
+            Storage.inboxData[keyToInsert] = KeyValuePairsWithFlag(
                 arrayOfKeys: [taskText],
-                arrayOfValues: [taskDate]
+                arrayOfValues: [taskDate],
+                arrayOfFlags: [withReminder]
             )
             
             Storage.inboxData["Today"]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
@@ -312,9 +400,9 @@ extension TodayTabViewController: AddActivityDelegate {
         Storage.inboxData["Today"]?.removeKeyAndValue(for: selectedRowIndex)
         
         if taskDateInString != todayDateInString {
-            Storage.inboxData[taskDateInString]?.append(key: taskText, value: taskDate)
+            Storage.inboxData[taskDateInString]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == todayDateInString {
-            Storage.inboxData["Today"]?.insert(at: selectedRowIndex, key: taskText, value: taskDate)
+            Storage.inboxData["Today"]?.insert(at: selectedRowIndex, key: taskText, value: taskDate, withReminder: withReminder)
         }
         
         makeValueNilForTodayKeyIfNoActivities()

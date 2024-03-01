@@ -8,7 +8,7 @@
 import UIKit
 
 protocol AddActivityDelegate: NSObject {
-    func saveNewTask(_ newTask: String, taskDate: Date)
+    func saveNewTask(_ newTask: String, taskDate: Date, withReminder: Bool)
     
-    func editSelectedTask(taskText: String, taskDate: Date)
+    func editSelectedTask(taskText: String, taskDate: Date, withReminder: Bool)
 }

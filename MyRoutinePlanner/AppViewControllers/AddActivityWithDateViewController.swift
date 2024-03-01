@@ -27,6 +27,49 @@ class AddActivityWithDateViewController: UIViewController {
         return configuredDatePicker
     }()
     
+    var withReminder = false
+    
+    let notificationToggleView: UIView = {
+        let configuratedView = UIView()
+        configuratedView.backgroundColor = .white
+        configuratedView.layer.cornerRadius = 10.0
+        
+        return configuratedView
+    }()
+    let timePicker: UIDatePicker = {
+        let configuredTimePicker = UIDatePicker()
+        configuredTimePicker.datePickerMode = .time
+        configuredTimePicker.minimumDate = Date()
+        
+        return configuredTimePicker
+    }()
+    let timePickerLabel: UILabel = {
+        let configuredLabel = UILabel()
+        configuredLabel.text = "Time:"
+        
+        return configuredLabel
+    }()
+    let notificationOptionView: UIView = {
+        let configuratedView = UIView()
+        configuratedView.backgroundColor = .white
+        configuratedView.layer.cornerRadius = 10.0
+        configuratedView.isHidden = true
+        
+        return configuratedView
+    }()
+    let switchControlLabel: UILabel = {
+        let configuredLabel = UILabel()
+        configuredLabel.text = "Send notification"
+        
+        return configuredLabel
+    }()
+    var switchControl: UISwitch = {
+        let configuredSwitch = UISwitch(frame: CGRect(x: 0, y: 0, width: 150, height: 150))
+        configuredSwitch.isOn = false
+        
+        return configuredSwitch
+    }()
+    
     var scrollView: UIScrollView!
     
     var contentView: UIView!
@@ -58,6 +101,23 @@ class AddActivityWithDateViewController: UIViewController {
         self.initialText = initialTextViewText
         self.initialTitle = initialTitle
         self.datePicker.date = initialDate
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String, initialFlag: Bool) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.withReminder = initialFlag
+        // TODO: when moving to another date remain previous time
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String, initialDate: Date, initialFlag: Bool) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.datePicker.date = initialDate
+        self.withReminder = initialFlag
+        // TODO: when moving to another date remain previous time
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -100,6 +160,37 @@ class AddActivityWithDateViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    private func setupSwitchControl() {
+        if withReminder {
+            switchControl.isOn = true
+            self.notificationOptionView.isHidden = false
+        }
+        
+        switchControl.addTarget(self, action: #selector(showReminderTimePicker(sender: )), for: .valueChanged)
+    }
+    
+    @objc private func showReminderTimePicker(sender: UISwitch) {
+        if sender.isOn {
+            self.notificationOptionView.isHidden = false
+            self.withReminder = true
+        } else {
+            self.notificationOptionView.isHidden = true
+            self.withReminder = false
+        }
+    }
+    
+    private func setupNotificationToggleView() {
+//        view.addSubview(notificationToggleView)
+        notificationToggleView.addSubview(switchControlLabel)
+        notificationToggleView.addSubview(switchControl)
+    }
+    
+    private func setupNotificationOptionView() {
+//        view.addSubview(notificationOptionView)
+        notificationOptionView.addSubview(timePickerLabel)
+        notificationOptionView.addSubview(timePicker)
+    }
+    
     private func configureTextView() {
         textView = UITextView()
         
@@ -121,15 +212,49 @@ class AddActivityWithDateViewController: UIViewController {
         contentView = UIView()
     }
     
+    private func setupTimePicker() {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.timeStyle = .none
+//        dateFormatter.dateStyle = .full
+//
+//        let
+//
+//        if self.datePicker.date == Date() {
+//            self.timePicker.minimumDate = Date()
+//        }
+        self.datePicker.addTarget(self, action: #selector(onDateValueChanged), for: .valueChanged)
+    }
+    
+    @objc private func onDateValueChanged() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .none
+        dateFormatter.dateStyle = .full
+        
+        let stringToday = dateFormatter.string(from: Date())
+        let stringChosen = dateFormatter.string(from: self.datePicker.date)
+        
+        if stringToday == stringChosen {
+            self.timePicker.minimumDate = Date()
+        } else {
+            self.timePicker.minimumDate = nil
+        }
+    }
+    
     private func setupUI() {
         setupView()
         configureTextView()
         configureContentView()
         configureScrollView()
+        setupSwitchControl()
+        setupNotificationToggleView()
+        setupNotificationOptionView()
+        setupTimePicker()
 
         
         contentView.addSubview(datePicker)
         contentView.addSubview(textView)
+        contentView.addSubview(notificationToggleView)
+        contentView.addSubview(notificationOptionView)
         scrollView.addSubview(contentView)
         view.addSubview(scrollView)
         
@@ -138,6 +263,12 @@ class AddActivityWithDateViewController: UIViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         textView.translatesAutoresizingMaskIntoConstraints = false
+        notificationToggleView.translatesAutoresizingMaskIntoConstraints = false
+        switchControl.translatesAutoresizingMaskIntoConstraints = false
+        switchControlLabel.translatesAutoresizingMaskIntoConstraints = false
+        timePicker.translatesAutoresizingMaskIntoConstraints = false
+        timePickerLabel.translatesAutoresizingMaskIntoConstraints = false
+        notificationOptionView.translatesAutoresizingMaskIntoConstraints = false
         
 
         NSLayoutConstraint.activate([
@@ -165,6 +296,42 @@ class AddActivityWithDateViewController: UIViewController {
             textView.trailingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.trailingAnchor),
             textView.bottomAnchor.constraint(equalTo: self.datePicker.bottomAnchor, constant: 70.0),
             textView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
+            
+            
+            notificationToggleView.topAnchor.constraint(equalTo: self.textView.bottomAnchor, constant: 40.0),
+            notificationToggleView.trailingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.trailingAnchor),
+            notificationToggleView.bottomAnchor.constraint(equalTo: self.notificationToggleView.topAnchor, constant: 45.0),
+            notificationToggleView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
+            
+            
+            switchControlLabel.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor),
+            switchControlLabel.trailingAnchor.constraint(equalTo: self.switchControl.leadingAnchor),
+            switchControlLabel.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
+            switchControlLabel.leadingAnchor.constraint(equalTo: self.notificationToggleView.leadingAnchor, constant: 10.0),
+            
+            
+            switchControl.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor, constant: 7.5),
+            switchControl.trailingAnchor.constraint(equalTo: self.notificationToggleView.trailingAnchor, constant: -10.0),
+            switchControl.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
+            switchControl.leadingAnchor.constraint(equalTo: self.switchControlLabel.trailingAnchor),
+            
+            
+            notificationOptionView.topAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor, constant: 15.0),
+            notificationOptionView.trailingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.trailingAnchor),
+            notificationOptionView.bottomAnchor.constraint(equalTo: self.notificationOptionView.topAnchor, constant: 45.0),
+            notificationOptionView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
+            
+            
+            timePickerLabel.topAnchor.constraint(equalTo: self.notificationOptionView.topAnchor),
+            timePickerLabel.trailingAnchor.constraint(equalTo: self.timePicker.leadingAnchor),
+            timePickerLabel.bottomAnchor.constraint(equalTo: self.notificationOptionView.bottomAnchor),
+            timePickerLabel.leadingAnchor.constraint(equalTo: self.notificationOptionView.leadingAnchor, constant: 10.0),
+
+            
+            timePicker.topAnchor.constraint(equalTo: self.notificationOptionView.topAnchor),
+            timePicker.trailingAnchor.constraint(equalTo: self.notificationOptionView.trailingAnchor, constant: -10.0),
+            timePicker.bottomAnchor.constraint(equalTo: self.notificationOptionView.bottomAnchor),
+            timePicker.leadingAnchor.constraint(equalTo: self.timePickerLabel.trailingAnchor),
         ])
     }
     
@@ -185,9 +352,75 @@ class AddActivityWithDateViewController: UIViewController {
         if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
             self.present(alertController, animated: true)
         } else {
-            delegate?.saveNewTask(self.textView.text, taskDate: datePicker.date)
+            delegate?.saveNewTask(self.textView.text, taskDate: datePicker.date, withReminder: withReminder)
+            addReminder()
             dismiss(animated: true)
         }
+    }
+    
+    private func addReminder() {
+        if self.withReminder == true {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .short
+            dateFormatter.timeStyle = .short
+            
+            let stringDate = dateFormatter.string(from: self.timePicker.date)
+            
+            print("stringDate: \(stringDate)")
+            
+            let dateComponents: [Substring] = (stringDate.split(separator: ",").first?.split(separator: "."))!
+            
+            let day: Int = Int(dateComponents[0])!
+            let month: Int = Int(dateComponents[1])!
+            let year: Int = Int(dateComponents[2])!
+            
+            let timeComponents: [Substring] = (stringDate.split(separator: ",").last?.split(separator: ":"))!
+            
+            let hour = Int(timeComponents[0].trimmingCharacters(in: .whitespaces))!
+            let minute = Int(timeComponents[1])!
+
+            print("date: \(day)/\(month)/\(year), \(hour):\(minute)")
+            
+            let reminderIdentifier = "\(self.textView.text!)-notification"
+            print(reminderIdentifier)
+            
+            dispatchNotification(identifier: reminderIdentifier, title: "Reminder", body: "Don't forget to do: " + self.textView.text, day: day, month: month, year: year, hour: hour, minute: minute)
+            
+            self.withReminder = false
+        }
+    }
+    
+    func dispatchNotification(identifier: String, title: String, body: String, day: Int, month: Int, year: Int, hour: Int, minute: Int) {
+        let identifier = identifier
+        let title = title
+        let body = body
+        let day = day
+        let month = month
+        let year = year
+        let hour = hour
+        let minute = minute
+        let isDaily = false
+        
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
+        dateComponents.day = day
+        dateComponents.month = month
+        dateComponents.year = year + 2000
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        notificationCenter.add(request)
     }
     
     @objc private func editTask() {
@@ -198,7 +431,7 @@ class AddActivityWithDateViewController: UIViewController {
         if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
             self.present(alertController, animated: true)
         } else {
-            delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date)
+            delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date, withReminder: withReminder)
             dismiss(animated: true)
         }
     }

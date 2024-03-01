@@ -36,7 +36,10 @@ class UICustomTableViewCell: UITableViewCell {
     var indexPath: IndexPath? {
         get {
             guard let superview = self.superview as? UITableView else {
-                fatalError("superview is not a UITableView")
+                guard let superviewFromContainerView = self.superview?.superview as? UITableView else {
+                    fatalError("superview is not a UITableView")
+                }
+                return superviewFromContainerView.indexPath(for: self)
             }
             return superview.indexPath(for: self)
         }

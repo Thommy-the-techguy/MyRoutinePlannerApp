@@ -11,6 +11,7 @@ struct CustomKeyValuePairs<K: Codable, V: Codable> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
     
+    
     var count: Int {
         get {
             return arrayOfKeys.count

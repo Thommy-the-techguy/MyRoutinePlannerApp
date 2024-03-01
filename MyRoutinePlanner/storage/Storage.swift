@@ -8,7 +8,7 @@
 import UIKit
 
 final class Storage: NSObject {
-    static var inboxData: [String:CustomKeyValuePairs<String, Date>] = [:]
+    static var inboxData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
     
     override init() {
         super.init()
@@ -126,7 +126,7 @@ final class Storage: NSObject {
         print("STORAGE READ")
         if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
             let decoder = JSONDecoder()
-            if let loadedData = try? decoder.decode([String:CustomKeyValuePairs<String, Date>].self, from: savedData) {
+            if let loadedData = try? decoder.decode([String:KeyValuePairsWithFlag<String, Date>].self, from: savedData) {
                 Storage.inboxData = loadedData
                 
                 
@@ -136,5 +136,69 @@ final class Storage: NSObject {
         
         print("REMOVING INVALID TASKS")
         removeInvalidTasks()
+        removeInvalidReminders()
+    }
+    
+    
+    
+    func removeInvalidReminders() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { [unowned self] (notificationRequests) in
+            var identifiers: [String] = []
+            var dates: [Date] = []
+            var messages: [String] = []
+            
+            print("\n\nidentifiers:\(identifiers)\ndates:\(dates)\nmessages\(messages)\n\n\n")
+            
+            //              customKeyValuePairs
+            //                       ^
+            //                       |
+            for value in Storage.inboxData.values {
+                for i in 0..<value.count {
+                    if value.getFlag(for: i) {
+                        let identifier = "\(value.getKey(for: i))-notification" // message + -notification
+                        identifiers.append(identifier)
+                        dates.append(value.getValue(for: i))
+                        messages.append(value.getKey(for: i))
+                    }
+                }
+            }
+            
+            print("\n\nidentifiers:\(identifiers)\ndates:\(dates)\nmessages\(messages)\n\n\n")
+            
+            var identifiersForRemoval: [String] = []
+            var messagesForRemoval: [String] = []
+            var datesForRemoval: [Date] = []
+            for i in 0..<identifiers.count {
+                print("date: \(dates[i])\ncurrentDate: \(Date())")
+                if !(notificationRequests.contains(where: { (request) in
+                    return request.identifier == identifiers[i]
+                } )) {
+                    identifiersForRemoval.append(identifiers[i])
+                    messagesForRemoval.append(messages[i])
+                    datesForRemoval.append(dates[i])
+                }
+            }
+            
+            print("\n\nidentifiersForRemoval:\(identifiersForRemoval)")
+            
+            for (key, value) in Storage.inboxData {
+                for i in 0..<value.count {
+                    let (text, date, flag) = value.getKeyAndValue(for: i)
+                    if messagesForRemoval.contains(text) && datesForRemoval.contains(date) && flag == true {
+                        Storage.inboxData[key]?.setKeyAndValue(for: i, key: text, value: date, withReminder: false)
+                        print("\n\n\nREMOVING REMINDER \(i) \(key) \(date)\n\n\n")
+                    }
+                }
+            }
+            
+            if !identifiersForRemoval.isEmpty {
+                postReloadDataNotification()
+                print("notification posted")
+            }
+        }
+    }
+    
+    func postReloadDataNotification() {
+        NotificationCenter.default.post(Notification(name: Notification.Name("ReloadData")))
     }
 }
