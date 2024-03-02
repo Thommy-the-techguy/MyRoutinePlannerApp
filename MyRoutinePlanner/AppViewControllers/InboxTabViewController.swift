@@ -300,6 +300,11 @@ extension InboxTabViewController: UITableViewDataSource {
             keyAndValueToAppend?.value = Calendar.current.date(from: dateComponents)!
             
             
+            // remove notification when moved to another section
+            let cell = self.tableView.cellForRow(at: sourceIndexPath) as! UICustomTableViewCell
+            cancelNotification(cell: cell)
+            
+            
             Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: (keyAndValueToAppend?.flag)!)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
             
@@ -482,6 +487,9 @@ extension InboxTabViewController: AddActivityDelegate {
             if withReminder {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
                 cell?.accessoryView?.isHidden = false
+            } else {
+                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+                cancelNotification(cell: cell)
             }
         }
         

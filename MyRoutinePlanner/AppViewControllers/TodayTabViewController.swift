@@ -9,9 +9,9 @@ import UIKit
 
 class TodayTabViewController: UIViewController {
     //TODO: 1) Add reminder when editing + remain switch on when entering editing if reminder was added before [x]
-    //      2) Remove reminder when editing if it was added and switch now is turned off
-    //      3) Change reminder date if dragged or edited to another day
-    //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages
+    //      2) Remove reminder when editing if it was added and switch now is turned off [x]
+    //      3) Change reminder date if dragged or edited to another day []
+    //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages []
     
     
     var tableView: UITableView! = nil
@@ -192,10 +192,14 @@ extension TodayTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { (contextualAction, view, boolValue) in
+        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { [unowned self] (contextualAction, view, boolValue) in
             self.selectedRowIndexPath = indexPath
             
             let (textViewText, _, flag) = (Storage.inboxData["Today"]?.getKeyAndValue(for: indexPath.row))!
+            
+            // remove notification so it won't double when changing task text
+            let cell = tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
+            cancelNotification(cell: cell)
             
             self.openEditView(initialTextViewText: textViewText, initialFlag: flag)
         })
@@ -375,6 +379,10 @@ extension TodayTabViewController: AddActivityDelegate {
         }
         
         print("Passed")
+        // cell that is getting edited
+//        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+//        cancelNotification(cell: cell)
+        
         guard Storage.inboxData[keyToInsert] != nil else {
 //            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
 //                arrayOfKeys: [taskText],
@@ -407,6 +415,9 @@ extension TodayTabViewController: AddActivityDelegate {
             if withReminder {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
                 cell?.accessoryView?.isHidden = false
+            } else {
+                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+                cancelNotification(cell: cell)
             }
         }
         
