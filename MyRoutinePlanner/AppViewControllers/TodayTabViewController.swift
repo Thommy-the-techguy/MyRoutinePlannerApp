@@ -66,7 +66,7 @@ class TodayTabViewController: UIViewController {
     
     private func configureTableView() {
         // configure UITableView
-        self.tableView = UITableView(frame: CGRect(x: 0.0, y: 0.0, width: 0, height: 0))
+        tableView = UITableView(frame: CGRect(), style: .insetGrouped)
         tableView.backgroundColor = .systemGray6
         tableView.layer.cornerRadius = 20
         

@@ -62,7 +62,7 @@ class InboxTabViewController: UIViewController {
     }
     
     private func configureTableView() {
-        tableView = UITableView()
+        tableView = UITableView(frame: CGRect(), style: .insetGrouped)
         tableView.backgroundColor = .systemGray6
         tableView.layer.cornerRadius = 20
         

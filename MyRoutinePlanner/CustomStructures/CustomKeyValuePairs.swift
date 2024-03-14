@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CustomKeyValuePairs<K: Codable, V: Codable> {
+struct CustomKeyValuePairs<K, V> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
     
@@ -67,6 +67,6 @@ struct CustomKeyValuePairs<K: Codable, V: Codable> {
     }
 }
 
-extension CustomKeyValuePairs: Codable {
-    
-}
+//extension CustomKeyValuePairs: Codable {
+//    
+//}
