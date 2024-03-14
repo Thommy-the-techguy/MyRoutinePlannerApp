@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchTabViewController: UIViewController {
+class CompletedTabViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

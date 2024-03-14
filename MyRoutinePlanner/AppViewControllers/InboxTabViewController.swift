@@ -11,6 +11,10 @@ class InboxTabViewController: UIViewController {
     var tableView: UITableView!
     var activityViewController: UIActivityViewController?
     var selectedRowIndexPath: IndexPath?
+    var searchBar: UISearchBar!
+    
+    var filteredData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
+    var searching = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +24,11 @@ class InboxTabViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewData), name: Notification.Name("TabSwitched"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewDataAsync), name: Notification.Name("ReloadData"), object: nil)
+        
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
         
         setupUI()
         
@@ -31,6 +40,11 @@ class InboxTabViewController: UIViewController {
         
         NotificationCenter.default.post(Notification(name: Notification.Name("TabSwitched")))
     }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     
     private func setupView() {
         // setting view's background color
@@ -57,20 +71,35 @@ class InboxTabViewController: UIViewController {
         tableView.delegate = self
         tableView.register(UICustomTableViewCell.self, forCellReuseIdentifier: "InboxCell")
     }
+    
+    private func setupSearchBar() {
+        searchBar = UISearchBar()
+        searchBar.placeholder = "Search"
+        searchBar.delegate = self
+        searchBar.searchBarStyle = .minimal
+    }
 
     private func setupUI() {
         setupView()
         configureTableView()
+        setupSearchBar()
         
         
         self.view.addSubview(tableView)
+        self.view.addSubview(searchBar)
         
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
         
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            searchBar.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            searchBar.bottomAnchor.constraint(equalTo: self.searchBar.topAnchor, constant: 40.0),
+            
+            tableView.topAnchor.constraint(equalTo: self.searchBar.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
@@ -78,7 +107,7 @@ class InboxTabViewController: UIViewController {
     }
     
     func deleteSectionIfNoActivities(sectionIndex: Int) {
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sectionIndex]
         
         print("called", currentKey)
@@ -86,6 +115,7 @@ class InboxTabViewController: UIViewController {
         
         if Storage.inboxData[currentKey]?.count == 0 {
             Storage.inboxData[currentKey] = nil
+            filteredData[currentKey] = nil
             self.tableView.beginUpdates()
             self.tableView.deleteSections([sectionIndex], with: .left)
             self.tableView.endUpdates()
@@ -141,14 +171,15 @@ extension InboxTabViewController: UITableViewDragDelegate {
 
 extension InboxTabViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return Storage.inboxData.count
+        return searching ? filteredData.count : Storage.inboxData.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
-        return (Storage.inboxData[currentKey]?.count)!
+//        return (Storage.inboxData[currentKey]?.count)!
+        return searching ? (filteredData[currentKey]?.count)! : (Storage.inboxData[currentKey]?.count)!
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -161,10 +192,16 @@ extension InboxTabViewController: UITableViewDataSource {
         let section = indexPath.section
         let indexOfCell = indexPath.row
         
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+//        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+//        let currentKey: String = arrayOfDataDictKeys[section]
+//        let message = Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
+//        let date = Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
+        
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
-        let message = Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
-        let date = Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
+        let message = searching ? filteredData[currentKey]?.getKey(for: indexOfCell) : Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
+        let date = searching ? filteredData[currentKey]?.getValue(for: indexOfCell) : Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
+        
         
         // MARK: - maybe not even necessary
         if let message, let date {
@@ -180,7 +217,12 @@ extension InboxTabViewController: UITableViewDataSource {
         
         cell.accessoryView = accessoryButton
         
-        if (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
+//        if (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
+//            cell.accessoryView?.isHidden = false
+//        } else {
+//            cell.accessoryView?.isHidden = true
+//        }
+        if searching ? (filteredData[currentKey]?.getFlag(for: indexPath.row))! : (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
             cell.accessoryView?.isHidden = false
         } else {
             cell.accessoryView?.isHidden = true
@@ -214,7 +256,7 @@ extension InboxTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
         return currentKey
@@ -237,8 +279,8 @@ extension InboxTabViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { (contextualAction, view, boolValue) in
-            let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let editButton = UIContextualAction(style: .normal, title: "Edit", handler: { [unowned self] (contextualAction, view, boolValue) in
+            let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
             let currentKey: String = arrayOfDataDictKeys[indexPath.section]
             
             self.selectedRowIndexPath = indexPath
@@ -247,8 +289,8 @@ extension InboxTabViewController: UITableViewDataSource {
             
             self.openEditView(initialTextViewText: initialText, initialDate: initialDate, initialFlag: initialFlag)
         })
-        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { (contextualAction, view, boolValue) in
-            let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { [unowned self] (contextualAction, view, boolValue) in
+            let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
             let currentKey: String = arrayOfDataDictKeys[indexPath.section]
             
             
@@ -259,6 +301,7 @@ extension InboxTabViewController: UITableViewDataSource {
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
+            filteredData[currentKey]?.removeKeyAndValue(for: indexPath.row)
             self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
             tableView.endUpdates()
             
@@ -284,7 +327,7 @@ extension InboxTabViewController: UITableViewDataSource {
         let destinationRowIndex = destinationIndexPath.row
         
         
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sourceSection]
         let destinationKey: String = arrayOfDataDictKeys[destinationSection]
         
@@ -308,6 +351,9 @@ extension InboxTabViewController: UITableViewDataSource {
             Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: (keyAndValueToAppend?.flag)!)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
             
+            filteredData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: (keyAndValueToAppend?.flag)!)
+            filteredData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
+            
         } else {
             let temp = Storage.inboxData[currentKey]?.getKeyAndValue(for: sourceRowIndex)
             let destinationKeyAndValue = Storage.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
@@ -316,6 +362,9 @@ extension InboxTabViewController: UITableViewDataSource {
             Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: (destinationKeyAndValue?.flag)!)
             Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: (temp?.flag)!)
             
+            
+            filteredData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: (destinationKeyAndValue?.flag)!)
+            filteredData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: (temp?.flag)!)
         }
         
         // TODO: - maybe do it with delay
@@ -359,15 +408,16 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[indexPath.section]
-        
+        print("current key: \(currentKey) row: \(indexPath.row) section: \(indexPath.section)")
         let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
         cancelNotification(cell: cell)
         
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
+        filteredData[currentKey]?.removeKeyAndValue(for: indexPath.row)
         self.tableView.endUpdates()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -383,7 +433,7 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         let reminderIdentifier = cellText + "-notification"
         
         let section = (cell.indexPath?.section)!
-        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
@@ -397,6 +447,7 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         }
         
         Storage.inboxData[currentKey]?.setFlag(for: (cell.indexPath?.row)!, withReminder: false)
+        filteredData[currentKey]?.setFlag(for: (cell.indexPath?.row)!, withReminder: false)
         
         cell.accessoryView?.isHidden = true
     }
@@ -407,7 +458,7 @@ extension InboxTabViewController: AddActivityDelegate {
     func editSelectedTask(taskText: String, taskDate: Date, withReminder: Bool) {
         let sectionIndex = (self.selectedRowIndexPath?.section)!
         print(sectionIndex)
-        var arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+        var arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[sectionIndex]
         print("current key: \(currentKey)")
         
@@ -458,9 +509,10 @@ extension InboxTabViewController: AddActivityDelegate {
             )
             
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
             
             // updating arrayOfDataDictKeys
-            arrayOfDataDictKeys = Array(Storage.inboxData.keys)
+            arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
             
             let updatedSectionIndex = arrayOfDataDictKeys.firstIndex(of: currentKey)!
             
@@ -478,11 +530,14 @@ extension InboxTabViewController: AddActivityDelegate {
         
         print("\n\n\nhere\n\n\n")
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
         
         if taskDateInString != currentDateInString {
             Storage.inboxData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
+            filteredData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == currentDateInString {
             Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
+            filteredData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
             
             if withReminder {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
@@ -548,5 +603,38 @@ extension InboxTabViewController: AddActivityDelegate {
 
         
         self.tableView.reloadData()
+    }
+}
+
+
+
+extension InboxTabViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        let data = Storage.inboxData
+        
+        if searchText.isEmpty {
+            searching = false
+            filteredData = [:]
+            self.tableView.reloadData()
+            print("empty")
+        } else {
+            searching = true
+//            for item in Storage.inboxData {
+//                if item.key.lowercased().contains(searchText.lowercased()) {
+//                    filteredData[item.key] = item.value
+//                }
+//            }
+            filteredData = Storage.inboxData.filter({ (key: String, value: KeyValuePairsWithFlag<String, Date>) in
+    
+                return key.range(of: searchText, options: .caseInsensitive) != nil
+            })
+            self.tableView.reloadData()
+        }
+        
+//        filteredData = searchText.isEmpty ? data : data.filter({ (key: String, value: KeyValuePairsWithFlag<String, Date>) in
+//            
+//            return key.range(of: searchText, options: .caseInsensitive) != nil
+//        })
+        // return dataString.range(of: searchText, options: .caseInsensitive) != nil
     }
 }

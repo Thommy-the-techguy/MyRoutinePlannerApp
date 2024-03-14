@@ -10,8 +10,10 @@ import UIKit
 class TodayTabViewController: UIViewController {
     //TODO: 1) Add reminder when editing + remain switch on when entering editing if reminder was added before [x]
     //      2) Remove reminder when editing if it was added and switch now is turned off [x]
-    //      3) Change reminder date if dragged or edited to another day []
+    //      3) Change reminder date if dragged or edited to another day [x?]
     //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages []
+    //      5) Fix can't set reminder less then current time but the day isn't today []
+    //      6) When searching and dragging reminder image doesn't want to remove (Because of Thread that removes invalid reminders) []
     
     
     var tableView: UITableView! = nil

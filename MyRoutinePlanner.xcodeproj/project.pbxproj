@@ -17,8 +17,8 @@
 		ACA3D9382B540DDD00726D85 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACA3D9362B540DDD00726D85 /* LaunchScreen.storyboard */; };
 		ACA3D9412B54212D00726D85 /* TodayTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9402B54212D00726D85 /* TodayTabViewController.swift */; };
 		ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */; };
-		ACA3D9452B54214800726D85 /* SearchTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9442B54214800726D85 /* SearchTabViewController.swift */; };
-		ACA3D9472B54215500726D85 /* BrowseTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9462B54215500726D85 /* BrowseTabViewController.swift */; };
+		ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */; };
+		ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */; };
 		ACAF06822B8115C80065A2EA /* KeyValuePairsWithFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */; };
 		ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */; };
 		ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */; };
@@ -41,8 +41,8 @@
 		ACA3D9392B540DDD00726D85 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ACA3D9402B54212D00726D85 /* TodayTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTabViewController.swift; sourceTree = "<group>"; };
 		ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxTabViewController.swift; sourceTree = "<group>"; };
-		ACA3D9442B54214800726D85 /* SearchTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTabViewController.swift; sourceTree = "<group>"; };
-		ACA3D9462B54215500726D85 /* BrowseTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseTabViewController.swift; sourceTree = "<group>"; };
+		ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedTabViewController.swift; sourceTree = "<group>"; };
+		ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabViewController.swift; sourceTree = "<group>"; };
 		ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValuePairsWithFlag.swift; sourceTree = "<group>"; };
 		ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICellAccessoryCheckbox.swift; sourceTree = "<group>"; };
 		ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityViewController.swift; sourceTree = "<group>"; };
@@ -111,8 +111,8 @@
 			children = (
 				ACA3D9402B54212D00726D85 /* TodayTabViewController.swift */,
 				ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */,
-				ACA3D9442B54214800726D85 /* SearchTabViewController.swift */,
-				ACA3D9462B54215500726D85 /* BrowseTabViewController.swift */,
+				ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */,
+				ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */,
 				ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */,
 				AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */,
 			);
@@ -228,9 +228,9 @@
 				ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */,
 				ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */,
 				ACA3D9412B54212D00726D85 /* TodayTabViewController.swift in Sources */,
-				ACA3D9452B54214800726D85 /* SearchTabViewController.swift in Sources */,
+				ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */,
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
-				ACA3D9472B54215500726D85 /* BrowseTabViewController.swift in Sources */,
+				ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */,
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 				AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */,
 			);

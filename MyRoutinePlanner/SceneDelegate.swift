@@ -25,13 +25,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         NotificationCenter.default.post(Notification(name: Notification.Name("AppLoaded")))
         
         // creating view controllers
-        let (todayTabVC, inboxTabVC, searchTabVC, browseTabVC) = (TodayTabViewController(), InboxTabViewController(), SearchTabViewController(), BrowseTabViewController())
+        let (todayTabVC, inboxTabVC, searchTabVC, browseTabVC) = (TodayTabViewController(), InboxTabViewController(), CompletedTabViewController(), SettingsTabViewController())
         
         // setting tab bar items title and image
         todayTabVC.tabBarItem = UITabBarItem(title: "Today", image: UIImage(systemName: "calendar"), tag: 0)
         inboxTabVC.tabBarItem = UITabBarItem(title: "Inbox", image: UIImage(systemName: "tray"), tag: 1)
-        searchTabVC.tabBarItem = UITabBarItem(title: "Search", image: UIImage(systemName: "magnifyingglass"), tag: 2)
-        browseTabVC.tabBarItem = UITabBarItem(title: "Browse", image: UIImage(systemName: "folder"), tag: 3)
+        searchTabVC.tabBarItem = UITabBarItem(title: "Completed", image: UIImage(systemName: "magnifyingglass"), tag: 2)
+        browseTabVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gear"), tag: 3)
         
         // creating corresponding navigation controllers
         let (navControllerTodayTab, navControllerInboxTab, navControllerSearchTab, navControllerBrowseTab) = (UINavigationController(rootViewController: todayTabVC), UINavigationController(rootViewController: inboxTabVC), UINavigationController(rootViewController: searchTabVC), UINavigationController(rootViewController: browseTabVC))

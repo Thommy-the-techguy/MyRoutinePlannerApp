@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BrowseTabViewController: UIViewController {
+class SettingsTabViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
