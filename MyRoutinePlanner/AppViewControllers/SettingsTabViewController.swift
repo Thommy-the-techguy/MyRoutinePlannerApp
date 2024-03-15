@@ -114,7 +114,19 @@ extension SettingsTabViewController: UITableViewDataSource {
         return cell
     }
     
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let settingName = (tableView.cellForRow(at: indexPath) as! UISettingsTableViewCell).getCellTextLabel().text!
+        
+        switch settingName {
+            case "Text Size":
+                let textSizeVC = TextSizeViewController()
+                let navigationVC = UINavigationController(rootViewController: textSizeVC)
+                self.present(navigationVC, animated: true)
+            case "Notifications": break
+                
+            default: break
+        }
+    }
 }
 
 

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		AC1EE7EE2BA33F0F003356EC /* UISettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */; };
+		AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */; };
+		AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */; };
+		AC58BDF72BA49FD900A9B981 /* Savable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF62BA49FD900A9B981 /* Savable.swift */; };
 		AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC64C9382B6BF2A500B971A8 /* Storage.swift */; };
 		AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */; };
 		ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D92B2B540DDB00726D85 /* AppDelegate.swift */; };
@@ -31,6 +34,9 @@
 
 /* Begin PBXFileReference section */
 		AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISettingsTableViewCell.swift; sourceTree = "<group>"; };
+		AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeViewController.swift; sourceTree = "<group>"; };
+		AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
+		AC58BDF62BA49FD900A9B981 /* Savable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Savable.swift; sourceTree = "<group>"; };
 		AC64C9382B6BF2A500B971A8 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityWithDateViewController.swift; sourceTree = "<group>"; };
 		ACA3D9282B540DDB00726D85 /* MyRoutinePlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyRoutinePlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +123,8 @@
 				ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */,
 				ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */,
 				AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */,
+				AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */,
+				AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */,
 			);
 			path = AppViewControllers;
 			sourceTree = "<group>";
@@ -136,6 +144,7 @@
 			children = (
 				ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */,
 				ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */,
+				AC58BDF62BA49FD900A9B981 /* Savable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -220,10 +229,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */,
 				ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */,
 				ACAF06822B8115C80065A2EA /* KeyValuePairsWithFlag.swift in Sources */,
+				AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */,
 				ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */,
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
+				AC58BDF72BA49FD900A9B981 /* Savable.swift in Sources */,
 				AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,

@@ -10,6 +10,8 @@ import UIKit
 final class Storage: NSObject {
     static var inboxData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
     
+    static var textSizePreference: Float = 17.0
+    
     override init() {
         super.init()
         
@@ -119,13 +121,35 @@ final class Storage: NSObject {
         } else {
             print("An encoding error has ocurred!")
         }
+        
+        saveTextSizePreferences(encoder: encoder, keyToSaveUnder: "TextSizePreferences")
+    }
+    
+    private func saveTextSizePreferences(encoder: JSONEncoder, keyToSaveUnder: String) {
+        if let encoded = try? encoder.encode(Storage.textSizePreference) {
+            UserDefaults.standard.set(encoded, forKey: keyToSaveUnder)
+            print(String(data: encoded, encoding: .utf8) ?? "No text size data aqcuired!")
+        } else {
+            print("An encoding error with text size preferences has ocurred!")
+        }
+    }
+    
+    private func readTextSizePreferences(decoder: JSONDecoder, keyToUse: String) {
+        if let savedTextSizePreference = UserDefaults.standard.object(forKey: keyToUse) as? Data {
+            if let loadedData = try? decoder.decode(Float.self, from: savedTextSizePreference) {
+                Storage.textSizePreference = loadedData
+                
+                
+                print("Text size preferences have been loaded.\nStorage Data: \(Storage.textSizePreference)")
+            }
+        }
     }
     
     // process readingSavedData when scene will load
     @objc func readData() {
         print("STORAGE READ")
+        let decoder = JSONDecoder()
         if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
-            let decoder = JSONDecoder()
             if let loadedData = try? decoder.decode([String:KeyValuePairsWithFlag<String, Date>].self, from: savedData) {
                 Storage.inboxData = loadedData
                 
@@ -133,6 +157,8 @@ final class Storage: NSObject {
                 print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
             }
         }
+        
+        readTextSizePreferences(decoder: decoder, keyToUse: "TextSizePreferences")
         
         print("REMOVING INVALID TASKS")
         removeInvalidTasks()

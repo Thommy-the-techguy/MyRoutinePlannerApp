@@ -207,8 +207,10 @@ extension InboxTabViewController: UITableViewDataSource {
         if let message, let date {
             cell.setText(message)
             cell.setDate(date)
+            
+            // change text label text size when settings updated
+            cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
         }
-        
         
         let accessoryButton = UIButton()
         accessoryButton.frame = CGRect(x: 0, y: 0, width: 20, height: 20) // replace magic constants

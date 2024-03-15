@@ -38,6 +38,10 @@ class TodayTabViewController: UIViewController {
         // set view title for navPanel
         title = "Today"
         
+//        // title size
+//        let attributes = [NSAttributedString.Key.font: UIFont(name: "System", size: CGFloat(Storage.textSizePreference))]
+//        navigationController?.navigationBar.titleTextAttributes = attributes as [NSAttributedString.Key : Any]
+        
         // add
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
         
@@ -136,6 +140,10 @@ extension TodayTabViewController: UITableViewDataSource {
         
         cell.setText((Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
         cell.setDate((Storage.inboxData["Today"]?.getValue(for: indexPath.row))!)
+        
+        // change text label text size when settings updated
+        cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+
         
         // TODO: set notifications
         let accessoryButton = UIButton()
