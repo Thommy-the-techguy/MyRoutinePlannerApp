@@ -39,7 +39,10 @@ class UICustomTableViewCell: UITableViewCell {
         get {
             guard let superview = self.superview as? UITableView else {
                 guard let superviewFromContainerView = self.superview?.superview as? UITableView else {
-                    fatalError("superview is not a UITableView")
+                    guard let superviewFromContainerViewTodayTab = self.superview?.superview?.superview as? UITableView else {
+                        fatalError("superview is not a UITableView")
+                    }
+                    return superviewFromContainerViewTodayTab.indexPath(for: self)
                 }
                 return superviewFromContainerView.indexPath(for: self)
             }
@@ -82,6 +85,10 @@ class UICustomTableViewCell: UITableViewCell {
     
     func getCellDateLabel() -> UILabel {
         return self.dateTextLabel
+    }
+    
+    func getCheckButton() -> UIButton {
+        return self.checkButton
     }
     
     override func prepareForReuse() {

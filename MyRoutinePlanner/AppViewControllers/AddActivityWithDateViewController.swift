@@ -213,15 +213,6 @@ class AddActivityWithDateViewController: UIViewController {
     }
     
     private func setupTimePicker() {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.timeStyle = .none
-//        dateFormatter.dateStyle = .full
-//
-//        let
-//
-//        if self.datePicker.date == Date() {
-//            self.timePicker.minimumDate = Date()
-//        }
         self.datePicker.addTarget(self, action: #selector(onDateValueChanged), for: .valueChanged)
     }
     

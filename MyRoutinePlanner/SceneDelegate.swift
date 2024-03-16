@@ -30,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // setting tab bar items title and image
         todayTabVC.tabBarItem = UITabBarItem(title: "Today", image: UIImage(systemName: "calendar"), tag: 0)
         inboxTabVC.tabBarItem = UITabBarItem(title: "Inbox", image: UIImage(systemName: "tray"), tag: 1)
-        searchTabVC.tabBarItem = UITabBarItem(title: "Completed", image: UIImage(systemName: "magnifyingglass"), tag: 2)
+        searchTabVC.tabBarItem = UITabBarItem(title: "Completed", image: UIImage(systemName: "checkmark.circle"), tag: 2)
         browseTabVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gear"), tag: 3)
         
         // creating corresponding navigation controllers

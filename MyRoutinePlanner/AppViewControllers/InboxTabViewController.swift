@@ -16,6 +16,19 @@ class InboxTabViewController: UIViewController {
     var filteredData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
     var searching = false
     
+    var currentTextSizePreference = Storage.textSizePreference
+    
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Inbox"
+        configuredTitleLabel.textAlignment = .center
+        
+        let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+        
+        return configuredTitleLabel
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -53,7 +66,8 @@ class InboxTabViewController: UIViewController {
         // scroll edge initialization for navBar
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
         
-        title = "Inbox"
+        // title
+        navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
         
@@ -178,7 +192,6 @@ extension InboxTabViewController: UITableViewDataSource {
         let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         
-//        return (Storage.inboxData[currentKey]?.count)!
         return searching ? (filteredData[currentKey]?.count)! : (Storage.inboxData[currentKey]?.count)!
     }
     
@@ -192,15 +205,14 @@ extension InboxTabViewController: UITableViewDataSource {
         let section = indexPath.section
         let indexOfCell = indexPath.row
         
-//        let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
-//        let currentKey: String = arrayOfDataDictKeys[section]
-//        let message = Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
-//        let date = Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
         
         let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
         let message = searching ? filteredData[currentKey]?.getKey(for: indexOfCell) : Storage.inboxData[currentKey]?.getKey(for: indexOfCell)
         let date = searching ? filteredData[currentKey]?.getValue(for: indexOfCell) : Storage.inboxData[currentKey]?.getValue(for: indexOfCell)
+        
+        
+        let imageSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
         
         
         // MARK: - maybe not even necessary
@@ -210,20 +222,28 @@ extension InboxTabViewController: UITableViewDataSource {
             
             // change text label text size when settings updated
             cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+            
+            // change text label date text size when settings updated
+            cell.getCellDateLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+            
+            // change buttons sizes
+            let checkButtonImage = UIImage(systemName: "circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+            
+            cell.getCheckButton().setImage(checkButtonImage, for: .normal)
         }
         
+        // setting reminder button
         let accessoryButton = UIButton()
-        accessoryButton.frame = CGRect(x: 0, y: 0, width: 20, height: 20) // replace magic constants
-        accessoryButton.setImage(UIImage(systemName: "bell.badge.fill"), for: .normal)
+        accessoryButton.frame = CGRect(x: 0, y: 0, width: Int(imageSize), height: Int(imageSize)) // replace magic constants
+
+        let reminderButtonImage = UIImage(systemName: "bell.badge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+//        accessoryButton.setImage(UIImage(systemName: "bell.badge.fill"), for: .normal)
+        accessoryButton.setImage(reminderButtonImage, for: .normal)
+
         accessoryButton.addTarget(self, action: #selector(cancelReminderWithIdentifier(sender: )), for: .touchUpInside)
         
         cell.accessoryView = accessoryButton
         
-//        if (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
-//            cell.accessoryView?.isHidden = false
-//        } else {
-//            cell.accessoryView?.isHidden = true
-//        }
         if searching ? (filteredData[currentKey]?.getFlag(for: indexPath.row))! : (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
             cell.accessoryView?.isHidden = false
         } else {
@@ -262,6 +282,17 @@ extension InboxTabViewController: UITableViewDataSource {
         let currentKey: String = arrayOfDataDictKeys[section]
         
         return currentKey
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+//        header.textLabel?.textColor = UIColor.red
+        
+        let textSize = Storage.textSizePreference > 21.0 ? 21.0 : Storage.textSizePreference
+        
+        header.textLabel?.font = UIFont.boldSystemFont(ofSize: CGFloat(textSize))
+        header.textLabel?.frame = header.bounds
+        header.textLabel?.textAlignment = .center
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -385,7 +416,14 @@ extension InboxTabViewController: UITableViewDataSource {
     }
     
     @objc func reloadTableViewDataAsync() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [unowned self] in
+            if currentTextSizePreference != Storage.textSizePreference {
+                let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+                viewControllerTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+                
+                currentTextSizePreference = Storage.textSizePreference
+            }
+            
             self.tableView.reloadData()
         }
     }
@@ -408,6 +446,7 @@ extension InboxTabViewController: UITableViewDelegate {
 
 extension InboxTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
+        // TODO: Implement colors and checkmark.circle of color according to Storage.data
         sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
         
         let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
@@ -499,10 +538,6 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         guard Storage.inboxData[key] != nil else {
-//            Storage.inboxData[key] = CustomKeyValuePairs(
-//                arrayOfKeys: [taskText],
-//                arrayOfValues: [taskDate]
-//            )
             
             Storage.inboxData[key] = KeyValuePairsWithFlag(
                 arrayOfKeys: [taskText],
@@ -584,10 +619,6 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         guard Storage.inboxData[keyToInsert] != nil else {
-//            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
-//                arrayOfKeys: [newTask],
-//                arrayOfValues: [taskDate]
-//            )
             
             Storage.inboxData[keyToInsert] = KeyValuePairsWithFlag(
                 arrayOfKeys: [newTask],
@@ -612,7 +643,6 @@ extension InboxTabViewController: AddActivityDelegate {
 
 extension InboxTabViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        let data = Storage.inboxData
         
         if searchText.isEmpty {
             searching = false
@@ -621,11 +651,7 @@ extension InboxTabViewController: UISearchBarDelegate {
             print("empty")
         } else {
             searching = true
-//            for item in Storage.inboxData {
-//                if item.key.lowercased().contains(searchText.lowercased()) {
-//                    filteredData[item.key] = item.value
-//                }
-//            }
+            
             filteredData = Storage.inboxData.filter({ (key: String, value: KeyValuePairsWithFlag<String, Date>) in
     
                 return key.range(of: searchText, options: .caseInsensitive) != nil
@@ -633,10 +659,5 @@ extension InboxTabViewController: UISearchBarDelegate {
             self.tableView.reloadData()
         }
         
-//        filteredData = searchText.isEmpty ? data : data.filter({ (key: String, value: KeyValuePairsWithFlag<String, Date>) in
-//            
-//            return key.range(of: searchText, options: .caseInsensitive) != nil
-//        })
-        // return dataString.range(of: searchText, options: .caseInsensitive) != nil
     }
 }

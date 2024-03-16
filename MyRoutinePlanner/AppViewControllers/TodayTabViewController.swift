@@ -14,12 +14,28 @@ class TodayTabViewController: UIViewController {
     //      4) Think about how to improve diversity of identifiers, so you can add dublicate messages []
     //      5) Fix can't set reminder less then current time but the day isn't today []
     //      6) When searching and dragging reminder image doesn't want to remove (Because of Thread that removes invalid reminders) []
+    //      7) Fix issue when opening edit of the cell and reminder time isn't what it was set before []
+    
+    // MARK: fonts to try later: "Noteworthy-Bold", "Noteworthy-Light", "Baskerville-SemiBoldItalic", "Baskerville-BoldItalic", "Baskerville-Italic"
     
     
     var tableView: UITableView! = nil
 
     var activityViewController: UIActivityViewController?
     var selectedRowIndexPath: IndexPath?
+    
+    var currentTextSizePreference = Storage.textSizePreference
+    
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Today"
+        configuredTitleLabel.textAlignment = .center
+        
+        let fontSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(fontSize))
+        
+        return configuredTitleLabel
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +52,8 @@ class TodayTabViewController: UIViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
         
         // set view title for navPanel
-        title = "Today"
-        
-//        // title size
-//        let attributes = [NSAttributedString.Key.font: UIFont(name: "System", size: CGFloat(Storage.textSizePreference))]
-//        navigationController?.navigationBar.titleTextAttributes = attributes as [NSAttributedString.Key : Any]
+//        title = "Today"
+        navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
         
         // add
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(addNewActivity))
@@ -141,13 +154,26 @@ extension TodayTabViewController: UITableViewDataSource {
         cell.setText((Storage.inboxData["Today"]?.getKey(for: indexPath.row))!)
         cell.setDate((Storage.inboxData["Today"]?.getValue(for: indexPath.row))!)
         
+        let imageSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        
         // change text label text size when settings updated
         cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
 
+        // change text label date text size when settings updated
+        cell.getCellDateLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+        
+        // change buttons sizes
+        let checkButtonImage = UIImage(systemName: "circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        cell.getCheckButton().setImage(checkButtonImage, for: .normal)
+        
         
         // TODO: set notifications
         let accessoryButton = UIButton()
-        accessoryButton.frame = CGRect(x: 0, y: 0, width: 20, height: 20) // replace magic constants
+        accessoryButton.frame = CGRect(x: 0, y: 0, width: Int(imageSize), height: Int(imageSize)) // replace magic constants
+        
+        let reminderButtonImage = UIImage(systemName: "bell.badge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        accessoryButton.setImage(reminderButtonImage, for: .normal)
+        
         accessoryButton.setImage(UIImage(systemName: "bell.badge.fill"), for: .normal)
         accessoryButton.addTarget(self, action: #selector(cancelReminderWithIdentifier(sender: )), for: .touchUpInside)
         
@@ -262,7 +288,14 @@ extension TodayTabViewController: UITableViewDataSource {
     }
     
     @objc func reloadTableViewDataAsync() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [unowned self] in
+            if currentTextSizePreference != Storage.textSizePreference {
+                let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+                viewControllerTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+                
+                currentTextSizePreference = Storage.textSizePreference
+            }
+            
             self.tableView.reloadData()
         }
     }
@@ -329,10 +362,6 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
 extension TodayTabViewController: AddActivityDelegate {
     func saveNewTask(_ newTask: String, taskDate: Date, withReminder: Bool) {
         guard var keyValuePairs = Storage.inboxData["Today"] else {
-//            Storage.inboxData["Today"] = CustomKeyValuePairs(
-//                arrayOfKeys: [newTask],
-//                arrayOfValues: [taskDate]
-//            )
             
             Storage.inboxData["Today"] = KeyValuePairsWithFlag(
                 arrayOfKeys: [newTask],
@@ -389,15 +418,8 @@ extension TodayTabViewController: AddActivityDelegate {
         }
         
         print("Passed")
-        // cell that is getting edited
-//        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
-//        cancelNotification(cell: cell)
         
         guard Storage.inboxData[keyToInsert] != nil else {
-//            Storage.inboxData[keyToInsert] = CustomKeyValuePairs(
-//                arrayOfKeys: [taskText],
-//                arrayOfValues: [taskDate]
-//            )
             
             Storage.inboxData[keyToInsert] = KeyValuePairsWithFlag(
                 arrayOfKeys: [taskText],

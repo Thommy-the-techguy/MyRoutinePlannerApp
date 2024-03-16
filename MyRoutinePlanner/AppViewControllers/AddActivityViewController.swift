@@ -75,13 +75,6 @@ class AddActivityViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(addNewTask))
     }
     
-//    private func setupTimePicker() {
-//        view.addSubview(timePicker)
-//    }
-    
-    //    private func setupSwitchControlLabel() {
-    //        view.addSubview(switchControlLabel)
-    //    }
     
     private func setupSwitchControl() {
         switchControl.addTarget(self, action: #selector(showReminderTimePicker(sender: )), for: .valueChanged)

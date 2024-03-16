@@ -23,6 +23,17 @@ class TextSizeViewController: UIViewController {
         return configuredLabel
     }()
     
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Text Size"
+        configuredTitleLabel.textAlignment = .center
+        
+        let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+        
+        return configuredTitleLabel
+    }()
+    
     let textSizeSlider: UISlider = {
         let configuredSlider = UISlider()
         configuredSlider.minimumValue = 10
@@ -80,7 +91,9 @@ class TextSizeViewController: UIViewController {
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dismissViewAndSaveChangesIfPresent))
         
-        self.title = "Text Size"
+//        self.title = "Text Size"
+        //title
+        navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
     }
     
     

@@ -10,6 +10,8 @@ import UIKit
 class SettingsTabViewController: UIViewController {
     var tableView: UITableView!
     
+    var currentTextSizePreference = Storage.textSizePreference
+    
     let tableViewData = CustomKeyValuePairs(
         arrayOfKeys: ["PERSONALIZATION", "PRODUCTIVITY"],
         arrayOfValues: [
@@ -21,6 +23,17 @@ class SettingsTabViewController: UIViewController {
             ]
         ]
     )
+    
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Settings"
+        configuredTitleLabel.textAlignment = .center
+        
+        let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+        
+        return configuredTitleLabel
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +46,8 @@ class SettingsTabViewController: UIViewController {
         // scroll edge initialization for navBar
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
         
+        // update to corresponding settings preferences
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableViewDataAsync), name: Notification.Name("ReloadData"), object: nil)
         
         setupUI()
     }
@@ -44,7 +59,8 @@ class SettingsTabViewController: UIViewController {
         // scroll edge initialization for navBar
         navigationController?.navigationBar.scrollEdgeAppearance = .init()
         
-        title = "Settings"
+        // title
+        navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
     }
     
 
@@ -76,6 +92,19 @@ class SettingsTabViewController: UIViewController {
         tableView.register(UISettingsTableViewCell.self, forCellReuseIdentifier: "SettingsCell")
     }
     
+    @objc func reloadTableViewDataAsync() {
+        DispatchQueue.main.async { [unowned self] in
+            if currentTextSizePreference != Storage.textSizePreference {
+                let textSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+                viewControllerTitleLabel.font = .boldSystemFont(ofSize: CGFloat(textSize))
+                
+                currentTextSizePreference = Storage.textSizePreference
+            }
+            
+            self.tableView.reloadData()
+        }
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -98,6 +127,15 @@ extension SettingsTabViewController: UITableViewDataSource {
         return tableViewData.count
     }
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+        
+        let textSize = Storage.textSizePreference > 21.0 ? 21.0 : Storage.textSizePreference
+        
+        header.textLabel?.font = UIFont.systemFont(ofSize: CGFloat(textSize))
+        header.textLabel?.frame = header.bounds
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell", for: indexPath) as! UISettingsTableViewCell // don't change the identifier!!!
         
@@ -108,6 +146,11 @@ extension SettingsTabViewController: UITableViewDataSource {
         
         cell.setImage(image)
         cell.setText(text)
+        
+        // change text label text size when settings updated
+        cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+        
+        
         cell.accessoryType = .disclosureIndicator
         
         
