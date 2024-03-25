@@ -255,12 +255,13 @@ extension InboxTabViewController: UITableViewDataSource {
     
     @objc private func cancelReminderWithIdentifier(sender: UIButton) {
         let cell = sender.superview as? UICustomTableViewCell
-        let reminder = Storage.inboxData["Today"]?.getReminder(for: (cell?.indexPath?.row)!)
-        let reminderIdentifier = reminder?.reminderIdentifier
         
         let section = (cell?.indexPath?.section)!
         let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
+        
+        let reminder = Storage.inboxData[currentKey]?.getReminder(for: (cell?.indexPath?.row)!)
+        let reminderIdentifier = reminder?.reminderIdentifier
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
            var identifiers: [String] = []
@@ -576,26 +577,29 @@ extension InboxTabViewController: AddActivityDelegate {
         print("\n\n\nhere\n\n\n")
 //        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
 //        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
-        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
-        cancelNotification(cell: cell)
+//        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+//        cancelNotification(cell: cell)
         
-        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
-        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+//        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+//        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
         
         if taskDateInString != currentDateInString {
             Storage.inboxData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
             filteredData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == currentDateInString {
-            Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
-            filteredData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
-            
             if withReminder != nil {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
                 cell?.accessoryView?.isHidden = false
             } else {
-//                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
-//                cancelNotification(cell: cell)
+                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+                cancelNotification(cell: cell)
             }
+            
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            
+            Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
+            filteredData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
         }
         
         self.tableView.reloadData()
