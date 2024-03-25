@@ -10,7 +10,8 @@ import Foundation
 struct KeyValuePairsWithFlag<K: Codable, V: Codable> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
-    private var arrayOfFlags: [Bool] = [] // for alarm
+//    private var arrayOfFlags: [Bool] = [] // for alarm
+    private var arrayOfReminders: [Reminder?] = [] // nil = no reminder
     
     var count: Int {
         get {
@@ -22,41 +23,41 @@ struct KeyValuePairsWithFlag<K: Codable, V: Codable> {
         
     }
     
-    init(arrayOfKeys: [K], arrayOfValues: [V], arrayOfFlags: [Bool]) {
-        if (arrayOfKeys.count != arrayOfValues.count) || (arrayOfValues.count != arrayOfFlags.count) || (arrayOfKeys.count != arrayOfFlags.count) {
+    init(arrayOfKeys: [K], arrayOfValues: [V], arrayOfReminders: [Reminder?]) {
+        if (arrayOfKeys.count != arrayOfValues.count) || (arrayOfValues.count != arrayOfReminders.count) || (arrayOfKeys.count != arrayOfReminders.count) {
             fatalError("CustomKeyValuePairs Error: arrayOfKeys length should equal to arrayOfValues length!")
         } else {
             self.arrayOfKeys = arrayOfKeys
             self.arrayOfValues = arrayOfValues
-            self.arrayOfFlags = arrayOfFlags
+            self.arrayOfReminders = arrayOfReminders
         }
     }
     
-    mutating func append(key: K, value: V, withReminder: Bool) {
+    mutating func append(key: K, value: V, withReminder: Reminder?) {
         self.arrayOfKeys.append(key)
         self.arrayOfValues.append(value)
-        self.arrayOfFlags.append(withReminder)
+        self.arrayOfReminders.append(withReminder)
     }
     
     mutating func removeKeyAndValue(for index: Int) {
         self.arrayOfKeys.remove(at: index)
         self.arrayOfValues.remove(at: index)
-        self.arrayOfFlags.remove(at: index)
+        self.arrayOfReminders.remove(at: index)
     }
     
-    mutating func insert(at: Int, key: K, value: V, withReminder: Bool) {
+    mutating func insert(at: Int, key: K, value: V, withReminder: Reminder?) {
         self.arrayOfKeys.insert(key, at: at)
         self.arrayOfValues.insert(value, at: at)
-        self.arrayOfFlags.insert(withReminder, at: at)
+        self.arrayOfReminders.insert(withReminder, at: at)
     }
     
-    mutating func setKeyAndValue(for index: Int, key: K, value: V, withReminder: Bool) {
+    mutating func setKeyAndValue(for index: Int, key: K, value: V, withReminder: Reminder?) {
         self.removeKeyAndValue(for: index)
         self.insert(at: index, key: key, value: value, withReminder: withReminder)
     }
     
-    mutating func setFlag(for index: Int, withReminder: Bool) {
-        self.arrayOfFlags[index] = withReminder
+    mutating func setReminder(for index: Int, withReminder: Reminder?) {
+        self.arrayOfReminders[index] = withReminder
     }
     
     func getKey(for index: Int) -> K {
@@ -67,16 +68,16 @@ struct KeyValuePairsWithFlag<K: Codable, V: Codable> {
         return self.arrayOfValues[index]
     }
     
-    func getFlag(for index: Int) -> Bool {
-        return self.arrayOfFlags[index]
+    func getReminder(for index: Int) -> Reminder? {
+        return self.arrayOfReminders[index]
     }
     
-    func getKeyAndValue(for index: Int) -> (key: K, value: V, flag: Bool) {
+    func getKeyAndValue(for index: Int) -> (key: K, value: V, reminder: Reminder?) {
         let key = self.arrayOfKeys[index]
         let value = self.arrayOfValues[index]
-        let flag = self.arrayOfFlags[index]
+        let reminder = self.arrayOfReminders[index]
         
-        return (key, value, flag)
+        return (key, value, reminder)
     }
 }
 

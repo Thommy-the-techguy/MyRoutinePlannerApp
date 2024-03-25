@@ -180,8 +180,8 @@ final class Storage: NSObject {
             //                       |
             for value in Storage.inboxData.values {
                 for i in 0..<value.count {
-                    if value.getFlag(for: i) {
-                        let identifier = "\(value.getKey(for: i))-notification" // message + -notification
+                    if value.getReminder(for: i) != nil {
+                        let identifier = (value.getReminder(for: i)?.reminderIdentifier)!
                         identifiers.append(identifier)
                         dates.append(value.getValue(for: i))
                         messages.append(value.getKey(for: i))
@@ -196,26 +196,29 @@ final class Storage: NSObject {
             var datesForRemoval: [Date] = []
             for i in 0..<identifiers.count {
                 print("date: \(dates[i])\ncurrentDate: \(Date())")
-                if !(notificationRequests.contains(where: { (request) in
+                if !notificationRequests.contains(where: { (request) in
                     return request.identifier == identifiers[i]
-                } )) {
+                } ) {
                     identifiersForRemoval.append(identifiers[i])
                     messagesForRemoval.append(messages[i])
                     datesForRemoval.append(dates[i])
                 }
             }
             
+            print("\n\nSTORAGE:\(Storage.inboxData)")
             print("\n\nidentifiersForRemoval:\(identifiersForRemoval)")
             
             for (key, value) in Storage.inboxData {
                 for i in 0..<value.count {
-                    let (text, date, flag) = value.getKeyAndValue(for: i)
-                    if messagesForRemoval.contains(text) && datesForRemoval.contains(date) && flag == true {
-                        Storage.inboxData[key]?.setKeyAndValue(for: i, key: text, value: date, withReminder: false)
+                    let (text, date, reminder) = value.getKeyAndValue(for: i)
+                    if messagesForRemoval.contains(text) && datesForRemoval.contains(date) && (reminder != nil) {
+                        Storage.inboxData[key]?.setKeyAndValue(for: i, key: text, value: date, withReminder: nil)
                         print("\n\n\nREMOVING REMINDER \(i) \(key) \(date)\n\n\n")
                     }
                 }
             }
+            
+            print("\n\n\n\n\nidentifiers:\(notificationRequests.debugDescription)\n\n\n\n\n")
             
             if !identifiersForRemoval.isEmpty {
                 postReloadDataNotification()

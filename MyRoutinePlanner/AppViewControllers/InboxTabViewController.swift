@@ -244,7 +244,7 @@ extension InboxTabViewController: UITableViewDataSource {
         
         cell.accessoryView = accessoryButton
         
-        if searching ? (filteredData[currentKey]?.getFlag(for: indexPath.row))! : (Storage.inboxData[currentKey]?.getFlag(for: indexPath.row))! {
+        if searching ? (filteredData[currentKey]?.getReminder(for: indexPath.row) != nil) : (Storage.inboxData[currentKey]?.getReminder(for: indexPath.row) != nil) {
             cell.accessoryView?.isHidden = false
         } else {
             cell.accessoryView?.isHidden = true
@@ -255,8 +255,8 @@ extension InboxTabViewController: UITableViewDataSource {
     
     @objc private func cancelReminderWithIdentifier(sender: UIButton) {
         let cell = sender.superview as? UICustomTableViewCell
-        let cellText = (cell?.getCellTextLabel().text)!
-        let reminderIdentifier = cellText + "-notification"
+        let reminder = Storage.inboxData["Today"]?.getReminder(for: (cell?.indexPath?.row)!)
+        let reminderIdentifier = reminder?.reminderIdentifier
         
         let section = (cell?.indexPath?.section)!
         let arrayOfDataDictKeys = Array(Storage.inboxData.keys)
@@ -272,7 +272,7 @@ extension InboxTabViewController: UITableViewDataSource {
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
         }
         
-        Storage.inboxData[currentKey]?.setFlag(for: (cell?.indexPath?.row)!, withReminder: false)
+        Storage.inboxData[currentKey]?.setReminder(for: (cell?.indexPath?.row)!, withReminder: nil)
         
         cell?.accessoryView?.isHidden = true
     }
@@ -303,7 +303,7 @@ extension InboxTabViewController: UITableViewDataSource {
 
     }
     
-    private func openEditView(initialTextViewText: String, initialDate: Date, initialFlag: Bool) {
+    private func openEditView(initialTextViewText: String, initialDate: Date, initialFlag: Reminder?) {
         let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialDate: initialDate, initialFlag: initialFlag)
         editActivityVC.delegate = self
         let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
@@ -318,9 +318,9 @@ extension InboxTabViewController: UITableViewDataSource {
             
             self.selectedRowIndexPath = indexPath
             
-            let (initialText, initialDate, initialFlag) = (Storage.inboxData[currentKey]?.getKeyAndValue(for: indexPath.row))!
+            let (initialText, initialDate, reminder) = (Storage.inboxData[currentKey]?.getKeyAndValue(for: indexPath.row))!
             
-            self.openEditView(initialTextViewText: initialText, initialDate: initialDate, initialFlag: initialFlag)
+            self.openEditView(initialTextViewText: initialText, initialDate: initialDate, initialFlag: reminder)
         })
         let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { [unowned self] (contextualAction, view, boolValue) in
             let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
@@ -381,10 +381,10 @@ extension InboxTabViewController: UITableViewDataSource {
             cancelNotification(cell: cell)
             
             
-            Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: (keyAndValueToAppend?.flag)!)
+            Storage.inboxData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: keyAndValueToAppend?.reminder)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
             
-            filteredData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: (keyAndValueToAppend?.flag)!)
+            filteredData[destinationKey]?.append(key: (keyAndValueToAppend?.key)!, value: (keyAndValueToAppend?.value)!, withReminder: keyAndValueToAppend?.reminder)
             filteredData[currentKey]?.removeKeyAndValue(for: sourceRowIndex)
             
         } else {
@@ -392,12 +392,12 @@ extension InboxTabViewController: UITableViewDataSource {
             let destinationKeyAndValue = Storage.inboxData[destinationKey]?.getKeyAndValue(for: destinationRowIndex)
             
             
-            Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: (destinationKeyAndValue?.flag)!)
-            Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: (temp?.flag)!)
+            Storage.inboxData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: destinationKeyAndValue?.reminder)
+            Storage.inboxData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: temp?.reminder)
             
             
-            filteredData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: (destinationKeyAndValue?.flag)!)
-            filteredData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: (temp?.flag)!)
+            filteredData[currentKey]?.setKeyAndValue(for: sourceRowIndex, key: (destinationKeyAndValue?.key)!, value: (destinationKeyAndValue?.value)!, withReminder: destinationKeyAndValue?.reminder)
+            filteredData[destinationKey]?.setKeyAndValue(for: destinationRowIndex, key: (temp?.key)!, value: (temp?.value)!, withReminder: temp?.reminder)
         }
         
         // TODO: - maybe do it with delay
@@ -470,12 +470,20 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
     }
     
     func cancelNotification(cell: UICustomTableViewCell) {
-        let cellText = cell.getCellTextLabel().text!
-        let reminderIdentifier = cellText + "-notification"
+//        let cellText = cell.getCellTextLabel().text!
+//        let sectionKey = (self.tableView.headerView(forSection: (cell.indexPath?.section)!)?.textLabel?.text)!
+//        let taskIndex = cell.indexPath?.row
         
         let section = (cell.indexPath?.section)!
         let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[section]
+        
+        let reminder = Storage.inboxData[currentKey]?.getReminder(for: (cell.indexPath?.row)!)
+        let reminderIdentifier = reminder?.reminderIdentifier
+        
+//        print("current key: \(currentKey)")
+//        print("current key: \(reminderIdentifier)")
+//        print("current key: \(Storage.inboxData[currentKey])")
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
            var identifiers: [String] = []
@@ -487,8 +495,8 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
         }
         
-        Storage.inboxData[currentKey]?.setFlag(for: (cell.indexPath?.row)!, withReminder: false)
-        filteredData[currentKey]?.setFlag(for: (cell.indexPath?.row)!, withReminder: false)
+        Storage.inboxData[currentKey]?.setReminder(for: (cell.indexPath?.row)!, withReminder: nil)
+        filteredData[currentKey]?.setReminder(for: (cell.indexPath?.row)!, withReminder: nil)
         
         cell.accessoryView?.isHidden = true
     }
@@ -496,7 +504,7 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
 
 
 extension InboxTabViewController: AddActivityDelegate {
-    func editSelectedTask(taskText: String, taskDate: Date, withReminder: Bool) {
+    func editSelectedTask(taskText: String, taskDate: Date, withReminder: Reminder?) {
         let sectionIndex = (self.selectedRowIndexPath?.section)!
         print(sectionIndex)
         var arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
@@ -517,7 +525,7 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         // TODO: here
-        if taskText == Storage.inboxData[currentKey]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == currentDateInString && withReminder == Storage.inboxData[currentKey]?.getFlag(for: (self.selectedRowIndexPath?.row)!) {
+        if taskText == Storage.inboxData[currentKey]?.getKey(for: (self.selectedRowIndexPath?.row)!) && taskDateInString == currentDateInString && withReminder == Storage.inboxData[currentKey]?.getReminder(for: (self.selectedRowIndexPath?.row)!) {
             return
         }
         
@@ -542,7 +550,7 @@ extension InboxTabViewController: AddActivityDelegate {
             Storage.inboxData[key] = KeyValuePairsWithFlag(
                 arrayOfKeys: [taskText],
                 arrayOfValues: [taskDate],
-                arrayOfFlags: [withReminder]
+                arrayOfReminders: [withReminder]
             )
             
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
@@ -566,6 +574,11 @@ extension InboxTabViewController: AddActivityDelegate {
         
         
         print("\n\n\nhere\n\n\n")
+//        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+//        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+        cancelNotification(cell: cell)
+        
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
         filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
         
@@ -576,12 +589,12 @@ extension InboxTabViewController: AddActivityDelegate {
             Storage.inboxData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
             filteredData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
             
-            if withReminder {
+            if withReminder != nil {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
                 cell?.accessoryView?.isHidden = false
             } else {
-                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
-                cancelNotification(cell: cell)
+//                let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
+//                cancelNotification(cell: cell)
             }
         }
         
@@ -594,7 +607,7 @@ extension InboxTabViewController: AddActivityDelegate {
         }
     }
     
-    func saveNewTask(_ newTask: String, taskDate: Date, withReminder: Bool) {
+    func saveNewTask(_ newTask: String, taskDate: Date, withReminder: Reminder?) {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .none
         dateFormatter.dateStyle = .full
@@ -623,7 +636,7 @@ extension InboxTabViewController: AddActivityDelegate {
             Storage.inboxData[keyToInsert] = KeyValuePairsWithFlag(
                 arrayOfKeys: [newTask],
                 arrayOfValues: [taskDate],
-                arrayOfFlags: [withReminder]
+                arrayOfReminders: [withReminder]
             )
             
             self.tableView.reloadData()
