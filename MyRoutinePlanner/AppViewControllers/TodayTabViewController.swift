@@ -204,6 +204,11 @@ extension TodayTabViewController: UITableViewDataSource {
         Storage.inboxData["Today"]?.setReminder(for: (cell?.indexPath?.row)!, withReminder: nil) // nil = no reminder
         
         cell?.accessoryView?.isHidden = true
+        
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
 
     
@@ -250,6 +255,10 @@ extension TodayTabViewController: UITableViewDataSource {
             
             self.reloadDataWithDelay(0.3)
             print(Storage.inboxData["Today"] as Any)
+            
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
         })
 
         let swipeActions = UISwipeActionsConfiguration(actions: [editButton, deleteButton])
@@ -337,6 +346,10 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         
         print(Storage.inboxData["Today"] ?? "nil")
         print("Completed Tasks: \(Storage.completedTasksData)")
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
     
     func cancelNotification(cell: UICustomTableViewCell) {
@@ -379,6 +392,10 @@ extension TodayTabViewController: AddActivityDelegate {
                 cell?.accessoryView?.isHidden = false
             }
             
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+            
             return
         }
         
@@ -386,6 +403,10 @@ extension TodayTabViewController: AddActivityDelegate {
         Storage.inboxData["Today"] = keyValuePairs
         
         self.tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
     
     func editSelectedTask(taskText: String, taskDate: Date, withReminder: Reminder?) {
@@ -434,6 +455,10 @@ extension TodayTabViewController: AddActivityDelegate {
             
             self.tableView.reloadData()
             
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+            
             return
         }
         
@@ -463,5 +488,9 @@ extension TodayTabViewController: AddActivityDelegate {
         makeValueNilForTodayKeyIfNoActivities()
         
         self.tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
 }

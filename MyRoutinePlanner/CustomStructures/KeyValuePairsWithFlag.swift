@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct KeyValuePairsWithFlag<K: Codable, V: Codable> {
+struct KeyValuePairsWithFlag<K: Codable & Equatable, V: Codable> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
 //    private var arrayOfFlags: [Bool] = [] // for alarm
@@ -84,6 +84,34 @@ struct KeyValuePairsWithFlag<K: Codable, V: Codable> {
 extension KeyValuePairsWithFlag: Codable {
     
 }
+
+
+
+
+
+extension KeyValuePairsWithFlag {
+    subscript(_ key: K) -> V? {
+        get {
+            let indexOfItem = arrayOfKeys.firstIndex(where: {
+                value in
+                value == key
+            })
+            return arrayOfValues[indexOfItem!]
+        }
+        set {
+            let indexOfItem = arrayOfKeys.firstIndex(where: {
+                value in
+                value == key
+            })
+            arrayOfValues[indexOfItem!] = newValue!
+        }
+    }
+}
+
+extension KeyValuePairsWithFlag {
+    
+}
+
 
 //extension KeyValuePairsWithFlag {
 //    // if key is type of String

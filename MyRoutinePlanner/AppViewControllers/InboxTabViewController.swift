@@ -121,18 +121,44 @@ class InboxTabViewController: UIViewController {
     }
     
     func deleteSectionIfNoActivities(sectionIndex: Int) {
-        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
-        let currentKey: String = arrayOfDataDictKeys[sectionIndex]
-        
-        print("called", currentKey)
-        print("Section Index To Remove\(String(describing: Storage.inboxData[currentKey]?.count))")
-        
-        if Storage.inboxData[currentKey]?.count == 0 {
-            Storage.inboxData[currentKey] = nil
-            filteredData[currentKey] = nil
-            self.tableView.beginUpdates()
-            self.tableView.deleteSections([sectionIndex], with: .left)
-            self.tableView.endUpdates()
+//        let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
+//        if sectionIndex < arrayOfDataDictKeys.count {
+//            let currentKey: String = arrayOfDataDictKeys[sectionIndex]
+//            
+//            print("called", currentKey)
+//            print("Section Index To Remove\(String(describing: Storage.inboxData[currentKey]?.count))")
+//            
+//            if Storage.inboxData[currentKey]?.count == 0 {
+//                self.tableView.beginUpdates()
+//                Storage.inboxData[currentKey] = nil
+//                filteredData[currentKey] = nil
+//                self.tableView.deleteSections([sectionIndex], with: .left)
+//                self.tableView.endUpdates()
+//            }
+//        }
+        var sectionsToRemove: [String] = []
+
+        for (sectionKey, sectionData) in Storage.inboxData {
+            if sectionData.count == 0 {
+                sectionsToRemove.append(sectionKey)
+            }
+        }
+
+        // Remove empty sections from Storage.inboxData and filteredData
+        for sectionKey in sectionsToRemove {
+            Storage.inboxData.removeValue(forKey: sectionKey)
+            filteredData.removeValue(forKey: sectionKey)
+        }
+
+        // Update table view to reflect changes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [unowned self] in
+            tableView.beginUpdates()
+            let indexSetToRemove = IndexSet(sectionsToRemove.compactMap { sectionKey in
+                Array(Storage.inboxData.keys).firstIndex(of: sectionKey)
+            })
+            
+            self.tableView.deleteSections(indexSetToRemove, with: .automatic)
+            tableView.endUpdates()
         }
     }
     
@@ -276,6 +302,10 @@ extension InboxTabViewController: UITableViewDataSource {
         Storage.inboxData[currentKey]?.setReminder(for: (cell?.indexPath?.row)!, withReminder: nil)
         
         cell?.accessoryView?.isHidden = true
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -287,7 +317,6 @@ extension InboxTabViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
-//        header.textLabel?.textColor = UIColor.red
         
         let textSize = Storage.textSizePreference > 21.0 ? 21.0 : Storage.textSizePreference
         
@@ -336,11 +365,19 @@ extension InboxTabViewController: UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .automatic)
             Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
             filteredData[currentKey]?.removeKeyAndValue(for: indexPath.row)
-            self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
             tableView.endUpdates()
             
+//            self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+//            
+//            self.reloadDataWithDelay(0.3)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+                self.tableView.reloadData()
+            }
             
-            self.reloadDataWithDelay(0.3)
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
         })
 
         let swipeActions = UISwipeActionsConfiguration(actions: [editButton, deleteButton])
@@ -410,6 +447,10 @@ extension InboxTabViewController: UITableViewDataSource {
             self.deleteSectionIfNoActivities(sectionIndex: sourceSection)
             self.tableView.reloadData()
         }
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
     
     @objc func reloadTableViewData() {
@@ -457,21 +498,27 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         cancelNotification(cell: cell)
         
         self.tableView.beginUpdates()
-        self.tableView.deleteRows(at: [indexPath], with: .automatic)
         let completedTask = Storage.inboxData[currentKey]?.getKey(for: indexPath.row)
         let timeOfCompletion = Date()
         Storage.completedTasksData.append(key: completedTask!, value: timeOfCompletion)
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
         filteredData[currentKey]?.removeKeyAndValue(for: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
         self.tableView.endUpdates()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.deleteSectionIfNoActivities(sectionIndex: indexPath.section)
-            self.tableView.reloadData()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [unowned self] in
+            deleteSectionIfNoActivities(sectionIndex: indexPath.section)
+            
+            tableView.reloadData()
         }
         
         print(Storage.inboxData)
         print("Completed Tasks: \(Storage.completedTasksData)")
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
     
     func cancelNotification(cell: UICustomTableViewCell) {
@@ -574,20 +621,20 @@ extension InboxTabViewController: AddActivityDelegate {
                 self.tableView.reloadData()
             }
             
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+            
             return
         }
         
         
         print("\n\n\nhere\n\n\n")
-//        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
-//        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
-//        let cell = self.tableView.cellForRow(at: selectedRowIndexPath!) as! UICustomTableViewCell
-//        cancelNotification(cell: cell)
-        
-//        Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
-//        filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
         
         if taskDateInString != currentDateInString {
+            Storage.inboxData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            filteredData[currentKey]?.removeKeyAndValue(for: (self.selectedRowIndexPath?.row)!)
+            
             Storage.inboxData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
             filteredData[key]?.append(key: taskText, value: taskDate, withReminder: withReminder)
         } else if taskDateInString == currentDateInString {
@@ -606,12 +653,16 @@ extension InboxTabViewController: AddActivityDelegate {
             filteredData[currentKey]?.insert(at: (self.selectedRowIndexPath?.row)!, key: taskText, value: taskDate, withReminder: withReminder)
         }
         
-        self.tableView.reloadData()
+//        self.tableView.reloadData()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
             print("should remove section with index \(sectionIndex)")
             self.deleteSectionIfNoActivities(sectionIndex: sectionIndex)
             self.tableView.reloadData()
+        }
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
         }
     }
     
@@ -649,6 +700,10 @@ extension InboxTabViewController: AddActivityDelegate {
             
             self.tableView.reloadData()
             
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+            
             return
         }
         
@@ -657,6 +712,10 @@ extension InboxTabViewController: AddActivityDelegate {
 
         
         self.tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            Storage().saveData()
+        }
     }
 }
 

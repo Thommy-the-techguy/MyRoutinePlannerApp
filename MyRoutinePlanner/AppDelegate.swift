@@ -97,17 +97,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
+        //        NotificationCenter.default.post(Notification(name: Notification.Name("AppAboutToTerminate")))
+//        let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+//                // Handle expiration if needed
+//        })
+            
         NotificationCenter.default.post(Notification(name: Notification.Name("AppAboutToTerminate")))
+
+            
+//        // End the background task
+//        UIApplication.shared.endBackgroundTask(backgroundTask)
     }
-//    // register for remote notifications
-//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-//        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-//        print("Device Token: \(token)")
-//    }
-//    
-//    // handling notifications (deprecated method)
-//    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-//        // Handle the notification and perform necessary actions
-////        completionHandler()
-//    }
 }

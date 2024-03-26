@@ -9,6 +9,7 @@ import UIKit
 
 final class Storage: NSObject {
     static var inboxData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
+//    static var inboxData: KeyValuePairsWithFlag<String, KeyValuePairsWithFlag<String, Date>> = KeyValuePairsWithFlag()
     
     static var completedTasksData: CodableKeyValuePairs<String, Date> = CodableKeyValuePairs()
     
@@ -114,7 +115,7 @@ final class Storage: NSObject {
     }
     
     // process app termination
-    @objc private func saveData() {
+    @objc func saveData() {
         print("STORAGE SAVE")
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(Storage.inboxData) {
@@ -170,6 +171,12 @@ final class Storage: NSObject {
                 
                 print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
             }
+//            if let loadedData = try? decoder.decode(KeyValuePairsWithFlag<String, KeyValuePairsWithFlag<String, Date>>.self, from: savedData) {
+//                Storage.inboxData = loadedData
+//                
+//                
+//                print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
+//            }
         }
         
         readTextSizePreferences(decoder: decoder, keyToUse: "TextSizePreferences")
@@ -178,9 +185,25 @@ final class Storage: NSObject {
         print("REMOVING INVALID TASKS")
         removeInvalidTasks()
         removeInvalidReminders()
+        
+        print("CLEANING COMPLETED TASKS")
+        cleanUpCompletedTasks()
+        
+        DispatchQueue.main.async { [unowned self] in
+            saveData()
+        }
     }
     
-    
+    // if completed tasks array has length > 100 performs cleanup on boot of an app
+    private func cleanUpCompletedTasks() {
+        DispatchQueue.main.async {
+            if Storage.completedTasksData.count > 100 {
+                for _ in 0...80 {
+                    Storage.completedTasksData.removeKeyAndValue(for: 0)
+                }
+            }
+        }
+    }
     
     func removeInvalidReminders() {
         UNUserNotificationCenter.current().getPendingNotificationRequests { [unowned self] (notificationRequests) in
