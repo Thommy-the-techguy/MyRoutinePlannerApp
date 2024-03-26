@@ -10,10 +10,11 @@
 		AC1EE7EE2BA33F0F003356EC /* UISettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */; };
 		AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */; };
 		AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */; };
-		AC58BDF72BA49FD900A9B981 /* Savable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF62BA49FD900A9B981 /* Savable.swift */; };
 		AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC64C9382B6BF2A500B971A8 /* Storage.swift */; };
 		AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */; };
 		AC9320362BB190500034ADE4 /* Reminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9320352BB190500034ADE4 /* Reminder.swift */; };
+		AC9521762BB2D570007092AC /* Savable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9521752BB2D570007092AC /* Savable.swift */; };
+		AC9521782BB2D78B007092AC /* CodableKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */; };
 		ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D92B2B540DDB00726D85 /* AppDelegate.swift */; };
 		ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D92D2B540DDB00726D85 /* SceneDelegate.swift */; };
 		ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D92F2B540DDB00726D85 /* ViewController.swift */; };
@@ -37,10 +38,11 @@
 		AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISettingsTableViewCell.swift; sourceTree = "<group>"; };
 		AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeViewController.swift; sourceTree = "<group>"; };
 		AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
-		AC58BDF62BA49FD900A9B981 /* Savable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Savable.swift; sourceTree = "<group>"; };
 		AC64C9382B6BF2A500B971A8 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityWithDateViewController.swift; sourceTree = "<group>"; };
 		AC9320352BB190500034ADE4 /* Reminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reminder.swift; sourceTree = "<group>"; };
+		AC9521752BB2D570007092AC /* Savable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Savable.swift; sourceTree = "<group>"; };
+		AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableKeyValuePairs.swift; sourceTree = "<group>"; };
 		ACA3D9282B540DDB00726D85 /* MyRoutinePlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyRoutinePlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACA3D92B2B540DDB00726D85 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ACA3D92D2B540DDB00726D85 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -146,7 +148,7 @@
 			children = (
 				ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */,
 				ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */,
-				AC58BDF62BA49FD900A9B981 /* Savable.swift */,
+				AC9521752BB2D570007092AC /* Savable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -157,6 +159,7 @@
 				ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */,
 				ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */,
 				AC9320352BB190500034ADE4 /* Reminder.swift */,
+				AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */,
 			);
 			path = CustomStructures;
 			sourceTree = "<group>";
@@ -238,11 +241,11 @@
 				AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */,
 				ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */,
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
-				AC58BDF72BA49FD900A9B981 /* Savable.swift in Sources */,
 				AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,
 				ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */,
+				AC9521782BB2D78B007092AC /* CodableKeyValuePairs.swift in Sources */,
 				ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */,
 				ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */,
 				ACA3D9412B54212D00726D85 /* TodayTabViewController.swift in Sources */,
@@ -252,6 +255,7 @@
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
 				ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */,
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
+				AC9521762BB2D570007092AC /* Savable.swift in Sources */,
 				AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

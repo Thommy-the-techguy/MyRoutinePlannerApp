@@ -458,6 +458,9 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        let completedTask = Storage.inboxData[currentKey]?.getKey(for: indexPath.row)
+        let timeOfCompletion = Date()
+        Storage.completedTasksData.append(key: completedTask!, value: timeOfCompletion)
         Storage.inboxData[currentKey]?.removeKeyAndValue(for: indexPath.row)
         filteredData[currentKey]?.removeKeyAndValue(for: indexPath.row)
         self.tableView.endUpdates()
@@ -468,6 +471,7 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         }
         
         print(Storage.inboxData)
+        print("Completed Tasks: \(Storage.completedTasksData)")
     }
     
     func cancelNotification(cell: UICustomTableViewCell) {

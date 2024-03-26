@@ -8,10 +8,10 @@
 import UIKit
 
 class TodayTabViewController: UIViewController {
-    //TODO: 1) Change reminder date if dragged or edited to another day [] !!!
+    //TODO: 1) Change reminder date if dragged or edited to another day (current behavour: when dragged dissapearse, when edited moves to another date) [x?] !!!
     //      2) When searching and dragging reminder image doesn't want to remove (Because of Thread that removes invalid reminders) [] !
-    //      3) Fix issue when opening edit of the cell and reminder time isn't what it was set before [] !!!
-    //      4) Add completed tasks (possibly create another CustomKeyValuePairs in Storage for them) (also maybe should clear them after let's say 50 completed tasks to not eat RAM and memory of the device) [] !!!
+    //      3) Add completed tasks (possibly create another CustomKeyValuePairs in Storage for them) (also maybe should clear them after let's say 50 completed tasks to not eat RAM and memory of the device) [] !!!
+    //      4) Add priorities [] !
     
     // MARK: fonts to try later: "Noteworthy-Bold", "Noteworthy-Light", "Baskerville-SemiBoldItalic", "Baskerville-BoldItalic", "Baskerville-Italic"
     
@@ -328,11 +328,15 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        let completedTask = Storage.inboxData["Today"]?.getKey(for: indexPath.row)
+        let timeOfCompletion = Date()
+        Storage.completedTasksData.append(key: completedTask!, value: timeOfCompletion)
         Storage.inboxData["Today"]?.removeKeyAndValue(for: indexPath.row)
         makeValueNilForTodayKeyIfNoActivities()
         self.tableView.endUpdates()
         
         print(Storage.inboxData["Today"] ?? "nil")
+        print("Completed Tasks: \(Storage.completedTasksData)")
     }
     
     func cancelNotification(cell: UICustomTableViewCell) {

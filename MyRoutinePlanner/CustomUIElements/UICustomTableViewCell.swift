@@ -79,6 +79,10 @@ class UICustomTableViewCell: UITableViewCell {
         }
     }
     
+    func getDate() -> Date? {
+        return self.date
+    }
+    
     func getCellTextLabel() -> UILabel {
         return self.label
     }

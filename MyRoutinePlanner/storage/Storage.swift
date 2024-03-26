@@ -10,6 +10,8 @@ import UIKit
 final class Storage: NSObject {
     static var inboxData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
     
+    static var completedTasksData: CodableKeyValuePairs<String, Date> = CodableKeyValuePairs()
+    
     static var textSizePreference: Float = 17.0
     
     override init() {
@@ -122,13 +124,14 @@ final class Storage: NSObject {
             print("An encoding error has ocurred!")
         }
         
-        saveTextSizePreferences(encoder: encoder, keyToSaveUnder: "TextSizePreferences")
+        saveUserData(encoder: encoder, keyToSaveUnder: "TextSizePreferences", dataToSave: Storage.textSizePreference)
+        saveUserData(encoder: encoder, keyToSaveUnder: "CompletedTasks", dataToSave: Storage.completedTasksData)
     }
     
-    private func saveTextSizePreferences(encoder: JSONEncoder, keyToSaveUnder: String) {
-        if let encoded = try? encoder.encode(Storage.textSizePreference) {
+    private func saveUserData(encoder: JSONEncoder, keyToSaveUnder: String, dataToSave: Savable) {
+        if let encoded = try? encoder.encode(dataToSave) {
             UserDefaults.standard.set(encoded, forKey: keyToSaveUnder)
-            print(String(data: encoded, encoding: .utf8) ?? "No text size data aqcuired!")
+            print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
         } else {
             print("An encoding error with text size preferences has ocurred!")
         }
@@ -140,7 +143,18 @@ final class Storage: NSObject {
                 Storage.textSizePreference = loadedData
                 
                 
-                print("Text size preferences have been loaded.\nStorage Data: \(Storage.textSizePreference)")
+                print("Text size preferences had been loaded.\nStorage Data: \(Storage.textSizePreference)")
+            }
+        }
+    }
+    
+    private func readCompletedTasks(decoder: JSONDecoder, keyToUse: String) {
+        if let savedTextSizePreference = UserDefaults.standard.object(forKey: keyToUse) as? Data {
+            if let loadedData = try? decoder.decode(CodableKeyValuePairs<String, Date>.self, from: savedTextSizePreference) {
+                Storage.completedTasksData = loadedData
+                
+                
+                print("Completed tasks had been loaded.\nStorage Data: \(Storage.textSizePreference)")
             }
         }
     }
@@ -159,6 +173,7 @@ final class Storage: NSObject {
         }
         
         readTextSizePreferences(decoder: decoder, keyToUse: "TextSizePreferences")
+        readCompletedTasks(decoder: decoder, keyToUse: "CompletedTasks")
         
         print("REMOVING INVALID TASKS")
         removeInvalidTasks()

@@ -1,12 +1,24 @@
 //
-//  Savable.swift
+//  SavableData.swift
 //  MyRoutinePlanner
 //
-//  Created by Артем Чижик on 15.03.24.
+//  Created by Артем Чижик on 26.03.24.
 //
 
-import UIKit
+import Foundation
 
-protocol Savable: NSObject {
+protocol Savable: Codable {
+    
+}
 
+extension KeyValuePairsWithFlag: Savable {
+    
+}
+
+extension CodableKeyValuePairs: Savable {
+    
+}
+
+extension Float: Savable {
+    
 }
