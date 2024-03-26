@@ -98,7 +98,13 @@ class TextSizeViewController: UIViewController {
     
     
     @objc private func dismissViewAndSaveChangesIfPresent() {
-        Storage.textSizePreference = self.textSizeSlider.value
+        if Storage.textSizePreference != self.textSizeSlider.value {
+            Storage.textSizePreference = self.textSizeSlider.value
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+        }
+        
         NotificationCenter.default.post(Notification(name: Notification.Name("ReloadData")))
         self.dismiss(animated: true)
     }
