@@ -118,6 +118,12 @@ extension CompletedTabViewController: UITableViewDataSource {
         cell.setText(text)
         cell.setDate(date)
         
+        // change text label text size when settings updated
+        cell.getCellTextLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+        
+        // change text label date text size when settings updated
+        cell.getCellDateLabel().font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
+        
         cell.getCheckButton().isHidden = true
         if #available(iOS 15.0, *) {
             cell.getCellDateLabel().text = cell.getDate()?.formatted(date: .numeric, time: .shortened)

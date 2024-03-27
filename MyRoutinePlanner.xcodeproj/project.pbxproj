@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		AC1EE7EE2BA33F0F003356EC /* UISettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */; };
+		AC2407052BB482C1000611D2 /* MorningOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2407042BB482C1000611D2 /* MorningOverviewViewController.swift */; };
+		AC2407072BB48325000611D2 /* EveningReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2407062BB48325000611D2 /* EveningReviewViewController.swift */; };
 		AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */; };
 		AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */; };
 		AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC64C9382B6BF2A500B971A8 /* Storage.swift */; };
@@ -36,6 +38,8 @@
 
 /* Begin PBXFileReference section */
 		AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISettingsTableViewCell.swift; sourceTree = "<group>"; };
+		AC2407042BB482C1000611D2 /* MorningOverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningOverviewViewController.swift; sourceTree = "<group>"; };
+		AC2407062BB48325000611D2 /* EveningReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EveningReviewViewController.swift; sourceTree = "<group>"; };
 		AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeViewController.swift; sourceTree = "<group>"; };
 		AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		AC64C9382B6BF2A500B971A8 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 				AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */,
 				AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */,
 				AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */,
+				AC2407042BB482C1000611D2 /* MorningOverviewViewController.swift */,
+				AC2407062BB48325000611D2 /* EveningReviewViewController.swift */,
 			);
 			path = AppViewControllers;
 			sourceTree = "<group>";
@@ -245,6 +251,7 @@
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,
 				ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */,
+				AC2407052BB482C1000611D2 /* MorningOverviewViewController.swift in Sources */,
 				AC9521782BB2D78B007092AC /* CodableKeyValuePairs.swift in Sources */,
 				ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */,
 				ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */,
@@ -253,6 +260,7 @@
 				AC9320362BB190500034ADE4 /* Reminder.swift in Sources */,
 				ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */,
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
+				AC2407072BB48325000611D2 /* EveningReviewViewController.swift in Sources */,
 				ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */,
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 				AC9521762BB2D570007092AC /* Savable.swift in Sources */,

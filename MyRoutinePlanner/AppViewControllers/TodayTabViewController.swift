@@ -10,7 +10,6 @@ import UIKit
 class TodayTabViewController: UIViewController {
     //TODO: 1) Change reminder date if dragged or edited to another day (current behavour: when dragged dissapearse, when edited moves to another date) [x?] !!!
     //      2) When searching and dragging reminder image doesn't want to remove (Because of Thread that removes invalid reminders) [] !
-    //      3) Add completed tasks (possibly create another CustomKeyValuePairs in Storage for them) (also maybe should clear them after let's say 50 completed tasks to not eat RAM and memory of the device) [] !!!
     //      4) Add priorities [] !
     
     // MARK: fonts to try later: "Noteworthy-Bold", "Noteworthy-Light", "Baskerville-SemiBoldItalic", "Baskerville-BoldItalic", "Baskerville-Italic"

@@ -155,7 +155,10 @@ extension SettingsTabViewController: UITableViewDataSource {
                 let textSizeVC = TextSizeViewController()
                 let navigationVC = UINavigationController(rootViewController: textSizeVC)
                 self.present(navigationVC, animated: true)
-            case "Notifications": break
+            case "Notifications":
+                let notificationsPreferencesVC = NotificationsViewController()
+                let navigationVC = UINavigationController(rootViewController: notificationsPreferencesVC)
+                self.present(navigationVC, animated: true)
                 
             default: break
         }

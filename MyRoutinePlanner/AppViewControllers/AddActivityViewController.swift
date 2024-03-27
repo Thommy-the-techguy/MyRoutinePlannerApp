@@ -13,6 +13,19 @@ class AddActivityViewController: UIViewController {
     var textView: UITextView! = nil
     var withReminder: Reminder? = nil
     
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Add Activity"
+        configuredTitleLabel.textAlignment = .center
+        
+        let fontSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(fontSize))
+        
+        return configuredTitleLabel
+    }()
+    
+    let fontSize = Storage.textSizePreference
+    
     let notificationToggleView: UIView = {
         let configuratedView = UIView()
         configuratedView.backgroundColor = .white
@@ -32,6 +45,9 @@ class AddActivityViewController: UIViewController {
         let configuredLabel = UILabel()
         configuredLabel.text = "Time:"
         
+        let fontSize = Storage.textSizePreference
+        configuredLabel.font = .systemFont(ofSize: CGFloat(fontSize))
+        
         return configuredLabel
     }()
     let notificationOptionView: UIView = {
@@ -45,6 +61,9 @@ class AddActivityViewController: UIViewController {
     let switchControlLabel: UILabel = {
         let configuredLabel = UILabel()
         configuredLabel.text = "Send notification"
+        
+        let fontSize = Storage.textSizePreference
+        configuredLabel.font = .systemFont(ofSize: CGFloat(fontSize))
         
         return configuredLabel
     }()
@@ -66,7 +85,8 @@ class AddActivityViewController: UIViewController {
     }
     
     private func setupView() {
-        title = "Add Activity"
+        //title
+        navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
         
         view.backgroundColor = .systemGray6
         
@@ -130,7 +150,7 @@ class AddActivityViewController: UIViewController {
         // making placeholder
         textView.text = placeholderText
         textView.textColor = .lightGray
-        textView.font = .systemFont(ofSize: 21.0)
+        textView.font = .systemFont(ofSize: CGFloat(fontSize))
         textView.backgroundColor = .white
 //        textView.backgroundColor = .red
         textView.layer.borderWidth = 1.0

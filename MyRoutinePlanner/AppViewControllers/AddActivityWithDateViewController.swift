@@ -13,6 +13,19 @@ class AddActivityWithDateViewController: UIViewController {
     
     lazy var contentViewSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
     
+    let viewControllerTitleLabel: UILabel = {
+        let configuredTitleLabel = UILabel()
+        configuredTitleLabel.text = "Add Activity"
+        configuredTitleLabel.textAlignment = .center
+        
+        let fontSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        configuredTitleLabel.font = .boldSystemFont(ofSize: CGFloat(fontSize))
+        
+        return configuredTitleLabel
+    }()
+    
+    let fontSize = Storage.textSizePreference
+    
     var datePicker: UIDatePicker = {
         let configuredDatePicker = UIDatePicker()
         configuredDatePicker.minimumDate = Date()
@@ -46,6 +59,9 @@ class AddActivityWithDateViewController: UIViewController {
         let configuredLabel = UILabel()
         configuredLabel.text = "Time:"
         
+        let fontSize = Storage.textSizePreference
+        configuredLabel.font = .systemFont(ofSize: CGFloat(fontSize))
+        
         return configuredLabel
     }()
     let notificationOptionView: UIView = {
@@ -59,6 +75,9 @@ class AddActivityWithDateViewController: UIViewController {
     let switchControlLabel: UILabel = {
         let configuredLabel = UILabel()
         configuredLabel.text = "Send notification"
+        
+        let fontSize = Storage.textSizePreference
+        configuredLabel.font = .systemFont(ofSize: CGFloat(fontSize))
         
         return configuredLabel
     }()
@@ -216,7 +235,7 @@ class AddActivityWithDateViewController: UIViewController {
         
         textView.text = (self.initialText == nil ? placeholderText : self.initialText)
         textView.textColor = (self.initialText == nil ? .lightGray : .black)
-        textView.font = .systemFont(ofSize: 21)
+        textView.font = .systemFont(ofSize: CGFloat(fontSize))
         textView.layer.cornerRadius = 10.0
         textView.delegate = self
     }
