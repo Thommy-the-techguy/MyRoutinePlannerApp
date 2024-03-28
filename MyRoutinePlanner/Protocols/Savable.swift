@@ -22,3 +22,15 @@ extension CodableKeyValuePairs: Savable {
 extension Float: Savable {
     
 }
+
+extension Bool: Savable {
+    
+}
+
+extension Date: Savable {
+    
+}
+
+extension [String]: Savable {
+    
+}

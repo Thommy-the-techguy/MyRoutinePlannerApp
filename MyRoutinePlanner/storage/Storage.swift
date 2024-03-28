@@ -15,6 +15,14 @@ final class Storage: NSObject {
     
     static var textSizePreference: Float = 17.0
     
+    static var morningNotificationPreference: [String] = ["false", "nil"] // couldn't find any better for now, 1st - isPreffered, 2nd - Date()
+//    static var morningNotificationPreference: Bool = false
+//    static var morningNotificationTime: Date?
+    
+    static var eveningNotificationPreference: [String] = ["false", "nil"]
+//    static var eveningNotificationPreference: Bool = false
+//    static var eveningNotificationTime: Date?
+    
     override init() {
         super.init()
         
@@ -127,6 +135,12 @@ final class Storage: NSObject {
         
         saveUserData(encoder: encoder, keyToSaveUnder: "TextSizePreferences", dataToSave: Storage.textSizePreference)
         saveUserData(encoder: encoder, keyToSaveUnder: "CompletedTasks", dataToSave: Storage.completedTasksData)
+        
+        saveUserData(encoder: encoder, keyToSaveUnder: "MorningNotificationPreference", dataToSave: Storage.morningNotificationPreference)
+//        saveUserData(encoder: encoder, keyToSaveUnder: "MorningNotificationTime", dataToSave: Storage.morningNotificationTime)
+        
+        saveUserData(encoder: encoder, keyToSaveUnder: "EveningNotificationPreference", dataToSave: Storage.eveningNotificationPreference)
+//        saveUserData(encoder: encoder, keyToSaveUnder: "EveningNotificationTime", dataToSave: Storage.eveningNotificationTime)
     }
     
     private func saveUserData(encoder: JSONEncoder, keyToSaveUnder: String, dataToSave: Savable) {
@@ -135,6 +149,40 @@ final class Storage: NSObject {
             print(String(data: encoded, encoding: .utf8) ?? "No data aqcuired!")
         } else {
             print("An encoding error with text size preferences has ocurred!")
+        }
+    }
+    
+    private func readMorningNotificationPreferences(decoder: JSONDecoder, keyToUse: String) {
+        if let savedNotificationPreference = UserDefaults.standard.object(forKey: keyToUse) as? Data {
+            if let loadedData = try? decoder.decode([String].self, from: savedNotificationPreference) {
+                if !loadedData.isEmpty {
+                    Storage.morningNotificationPreference = loadedData
+                } else {
+                    Storage.morningNotificationPreference = ["false", "nil"]
+                }
+                
+                
+                
+                print("Morning notification preferences had been loaded.\nStorage Data: \(Storage.morningNotificationPreference)")
+            }
+            
+            print()
+        }
+    }
+    
+    private func readEveningNotificationPreferences(decoder: JSONDecoder, keyToUse: String) {
+        if let savedNotificationPreference = UserDefaults.standard.object(forKey: keyToUse) as? Data {
+            if let loadedData = try? decoder.decode([String].self, from: savedNotificationPreference) {
+                if !loadedData.isEmpty {
+                    Storage.eveningNotificationPreference = loadedData
+                } else {
+                    Storage.eveningNotificationPreference = ["false", "nil"]
+                }
+                
+                
+                
+                print("Evening notification preferences had been loaded.\nStorage Data: \(Storage.eveningNotificationPreference)")
+            }
         }
     }
     
@@ -181,6 +229,8 @@ final class Storage: NSObject {
         
         readTextSizePreferences(decoder: decoder, keyToUse: "TextSizePreferences")
         readCompletedTasks(decoder: decoder, keyToUse: "CompletedTasks")
+        readMorningNotificationPreferences(decoder: decoder, keyToUse: "MorningNotificationPreference")
+        readEveningNotificationPreferences(decoder: decoder, keyToUse: "EveningNotificationPreference")
         
         print("REMOVING INVALID TASKS")
         removeInvalidTasks()

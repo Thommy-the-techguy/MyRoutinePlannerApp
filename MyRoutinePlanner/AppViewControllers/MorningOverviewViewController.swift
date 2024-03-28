@@ -8,6 +8,25 @@
 import UIKit
 
 class MorningOverviewViewController: UIViewController {
+    var isPreffered: Bool! = Bool(Storage.morningNotificationPreference[0])
+    var prefferedTime: Date? = {
+        let dateFormatter = DateFormatter()
+        let storageDate: String = Storage.morningNotificationPreference[1]
+        
+        if storageDate != "nil" {
+            let timeComponentsInString = storageDate.split(separator: " ")[0].split(separator: ":")
+            let hour = Int(timeComponentsInString[0])
+            let minute = Int(timeComponentsInString[1])
+            
+            let timeComponents = DateComponents(hour: hour, minute: minute)
+            let time = Calendar.current.date(from: timeComponents)
+            
+            return time
+        } else {
+            return nil
+        }
+    }()
+    
     let viewControllerTitleLabel: UILabel = {
         let configuredTitleLabel = UILabel()
         configuredTitleLabel.text = "Morning task overview"
@@ -28,6 +47,10 @@ class MorningOverviewViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         setupUI()
+        
+        let calendar = Calendar.current
+        
+        
     }
 
     private func setupUI() {
@@ -67,6 +90,29 @@ class MorningOverviewViewController: UIViewController {
     }
     
     @objc private func dismissView() {
+        let storagePreference = Bool(Storage.morningNotificationPreference[0])!
+        let storageTime = Storage.morningNotificationPreference[1]
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .full
+        
+        let timeToSave = dateFormatter.string(from: prefferedTime!)
+        
+        if isPreffered != storagePreference || storageTime != timeToSave {
+            if isPreffered {
+                print("saving time: \(timeToSave)")
+                Storage.morningNotificationPreference = [String(isPreffered), timeToSave]
+            } else {
+                Storage.morningNotificationPreference = [String(isPreffered), "nil"]
+            }
+            
+            DispatchQueue.main.async {
+                Storage().saveData()
+            }
+        }
+        
+        
         self.dismiss(animated: true)
     }
 }
@@ -82,7 +128,16 @@ extension MorningOverviewViewController: UITableViewDataSource {
         cell.textLabel?.text = tableViewData[indexPath.row]
         
         if indexPath.row == 0 {
-            let uiSwitch = UISwitch()
+            let uiSwitch: UISwitch = {
+                let configuredUISwitch = UISwitch()
+                configuredUISwitch.setOn(isPreffered, animated: true)
+                
+                configuredUISwitch.addTarget(self, action: #selector(switchChanged), for: .valueChanged)
+                
+                return configuredUISwitch
+            }()
+            
+            
             cell.accessoryView = uiSwitch
         } else if indexPath.row == 1 {
             let timePicker: UIDatePicker = {
@@ -91,8 +146,15 @@ extension MorningOverviewViewController: UITableViewDataSource {
                 configuredDatePicker.datePickerMode = .time
                 
                 var dateComponents = DateComponents(hour: 8, minute: 0)
-                let startTime = Calendar.current.date(from: dateComponents)!
-                configuredDatePicker.date = startTime
+                var startTime = Calendar.current.date(from: dateComponents)!
+
+                if prefferedTime != nil {
+                    startTime = prefferedTime!
+                } else {
+                    prefferedTime = startTime
+                }
+
+                configuredDatePicker.date = prefferedTime!
                 
                 dateComponents = DateComponents(hour: 4, minute: 0)
                 let minDate = Calendar.current.date(from: dateComponents)
@@ -101,6 +163,12 @@ extension MorningOverviewViewController: UITableViewDataSource {
                 dateComponents = DateComponents(hour: 11, minute: 59)
                 let maxTime = Calendar.current.date(from: dateComponents)
                 configuredDatePicker.maximumDate = maxTime
+                
+                
+                
+                configuredDatePicker.addTarget(self, action: #selector(timeChanged(sender: )), for: .valueChanged)
+                
+                
                 
                 return configuredDatePicker
             }()
@@ -115,7 +183,66 @@ extension MorningOverviewViewController: UITableViewDataSource {
         return cell
     }
     
+    @objc private func switchChanged() {
+        isPreffered = isPreffered ? false : true
+        
+        let notificationComponents = Calendar.current.dateComponents([.hour, .minute], from: prefferedTime!)
+        
+        removeNotificationIfPrefferenceIsOff()
+        postNotificationWithTime(hour: notificationComponents.hour!, minute: notificationComponents.minute!)
+    }
     
+    @objc private func timeChanged(sender: UIDatePicker) {
+        prefferedTime = sender.date
+        print("prefferedTime: \(prefferedTime)")
+        let notificationComponents = Calendar.current.dateComponents([.hour, .minute], from: prefferedTime!)
+        
+        postNotificationWithTime(hour: notificationComponents.hour!, minute: notificationComponents.minute!)
+    }
+    
+    private func postNotificationWithTime(hour: Int, minute: Int) {
+        if isPreffered {
+            DispatchQueue.main.async { [unowned self] in
+                addMorningNotification(hour: hour, minute: minute)
+            }
+        }
+    }
+    
+    private func removeNotificationIfPrefferenceIsOff() {
+        if !isPreffered {
+            UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+                var identifiers: [String] = ["morning-notification"]
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+            }
+        }
+    }
+    
+    private func addMorningNotification(hour: Int, minute: Int) {
+        let identifier = "morning-notification"
+        let title = "Time to check your tasks"
+        let body = "Good mornin'! Don't forget to check your tasks for today!"
+        let hour = hour
+        let minute = minute
+        let isDaily = true
+        
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        notificationCenter.add(request)
+    }
 }
 
 extension MorningOverviewViewController: UITableViewDragDelegate {

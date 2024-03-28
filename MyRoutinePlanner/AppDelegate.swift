@@ -13,32 +13,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let storage = Storage()
     
-    func dispatchNotification() {
-        let identifier = "morning-notification"
-        let title = "Time to check your tasks"
-        let body = "Don't forget to check your tasks for today!"
-        let hour = 8
-        let minute = 0
-        let isDaily = true
-        
-        let notificationCenter = UNUserNotificationCenter.current()
-        
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = .default
-        
-        let calendar = Calendar.current
-        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
-        dateComponents.hour = hour
-        dateComponents.minute = minute
-        
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
-        notificationCenter.add(request)
-    }
+//    func dispatchNotification() {
+//        let identifier = "morning-notification"
+//        let title = "Time to check your tasks"
+//        let body = "Don't forget to check your tasks for today!"
+//        let hour = 8
+//        let minute = 0
+//        let isDaily = true
+//        
+//        let notificationCenter = UNUserNotificationCenter.current()
+//        
+//        let content = UNMutableNotificationContent()
+//        content.title = title
+//        content.body = body
+//        content.sound = .default
+//        
+//        let calendar = Calendar.current
+//        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
+//        dateComponents.hour = hour
+//        dateComponents.minute = minute
+//        
+//        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
+//        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+//        
+//        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+//        notificationCenter.add(request)
+//    }
     
     func startAlarmCleaningThread() {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -70,7 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if granted {
                 DispatchQueue.main.async {
 //                    UIApplication.shared.registerForRemoteNotifications()
-                    self.dispatchNotification()
+//                    self.dispatchNotification()
+                    print("Permission for push notifications granted.")
                 }
             } else {
                 print("Permission for push notifications denied.")
