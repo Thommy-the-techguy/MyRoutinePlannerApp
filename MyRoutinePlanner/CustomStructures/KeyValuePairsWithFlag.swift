@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct KeyValuePairsWithFlag<K: Codable & Equatable, V: Codable> {
+struct KeyValuePairsWithFlag<K: Codable, V: Codable, P: Codable> {
     private var arrayOfKeys: [K] = [] // Messages, can be something else
     private var arrayOfValues: [V] = [] // Date, can be something else
-//    private var arrayOfFlags: [Bool] = [] // for alarm
     private var arrayOfReminders: [Reminder?] = [] // nil = no reminder
+    private var arrayOfPriorities: [P] = [] // priorities
     
     var count: Int {
         get {
@@ -23,37 +23,41 @@ struct KeyValuePairsWithFlag<K: Codable & Equatable, V: Codable> {
         
     }
     
-    init(arrayOfKeys: [K], arrayOfValues: [V], arrayOfReminders: [Reminder?]) {
-        if (arrayOfKeys.count != arrayOfValues.count) || (arrayOfValues.count != arrayOfReminders.count) || (arrayOfKeys.count != arrayOfReminders.count) {
-            fatalError("CustomKeyValuePairs Error: arrayOfKeys length should equal to arrayOfValues length!")
+    init(arrayOfKeys: [K], arrayOfValues: [V], arrayOfReminders: [Reminder?], arrayOfPriorities: [P]) {
+        if (arrayOfKeys.count != arrayOfValues.count) || (arrayOfValues.count != arrayOfReminders.count) || (arrayOfKeys.count != arrayOfReminders.count) || (arrayOfKeys.count != arrayOfPriorities.count) || (arrayOfValues.count != arrayOfPriorities.count) || (arrayOfReminders.count != arrayOfPriorities.count) {
+            fatalError("CustomKeyValuePairs Error: all array sizes should be equal (arrayOfKeys = arrayOfValues = arrayOfReminders = arrayOfPriorities)!")
         } else {
             self.arrayOfKeys = arrayOfKeys
             self.arrayOfValues = arrayOfValues
             self.arrayOfReminders = arrayOfReminders
+            self.arrayOfPriorities = arrayOfPriorities
         }
     }
     
-    mutating func append(key: K, value: V, withReminder: Reminder?) {
+    mutating func append(key: K, value: V, withReminder: Reminder?, priority: P) {
         self.arrayOfKeys.append(key)
         self.arrayOfValues.append(value)
         self.arrayOfReminders.append(withReminder)
+        self.arrayOfPriorities.append(priority)
     }
     
     mutating func removeKeyAndValue(for index: Int) {
         self.arrayOfKeys.remove(at: index)
         self.arrayOfValues.remove(at: index)
         self.arrayOfReminders.remove(at: index)
+        self.arrayOfPriorities.remove(at: index)
     }
     
-    mutating func insert(at: Int, key: K, value: V, withReminder: Reminder?) {
+    mutating func insert(at: Int, key: K, value: V, withReminder: Reminder?, priority: P) {
         self.arrayOfKeys.insert(key, at: at)
         self.arrayOfValues.insert(value, at: at)
         self.arrayOfReminders.insert(withReminder, at: at)
+        self.arrayOfPriorities.insert(priority, at: at)
     }
     
-    mutating func setKeyAndValue(for index: Int, key: K, value: V, withReminder: Reminder?) {
+    mutating func setKeyAndValue(for index: Int, key: K, value: V, withReminder: Reminder?, priority: P) {
         self.removeKeyAndValue(for: index)
-        self.insert(at: index, key: key, value: value, withReminder: withReminder)
+        self.insert(at: index, key: key, value: value, withReminder: withReminder, priority: priority)
     }
     
     mutating func setReminder(for index: Int, withReminder: Reminder?) {
@@ -72,60 +76,20 @@ struct KeyValuePairsWithFlag<K: Codable & Equatable, V: Codable> {
         return self.arrayOfReminders[index]
     }
     
-    func getKeyAndValue(for index: Int) -> (key: K, value: V, reminder: Reminder?) {
+    func getPriority(for index: Int) -> P {
+        return self.arrayOfPriorities[index]
+    }
+    
+    func getKeyAndValue(for index: Int) -> (key: K, value: V, reminder: Reminder?, priority: P) {
         let key = self.arrayOfKeys[index]
         let value = self.arrayOfValues[index]
         let reminder = self.arrayOfReminders[index]
+        let priority = self.arrayOfPriorities[index]
         
-        return (key, value, reminder)
+        return (key, value, reminder, priority)
     }
 }
 
 extension KeyValuePairsWithFlag: Codable {
     
 }
-
-
-
-
-
-extension KeyValuePairsWithFlag {
-    subscript(_ key: K) -> V? {
-        get {
-            let indexOfItem = arrayOfKeys.firstIndex(where: {
-                value in
-                value == key
-            })
-            return arrayOfValues[indexOfItem!]
-        }
-        set {
-            let indexOfItem = arrayOfKeys.firstIndex(where: {
-                value in
-                value == key
-            })
-            arrayOfValues[indexOfItem!] = newValue!
-        }
-    }
-}
-
-extension KeyValuePairsWithFlag {
-    
-}
-
-
-//extension KeyValuePairsWithFlag {
-//    // if key is type of String
-//    func findByKey(_ key: String ) -> [(key: String, value: V)] { // key is message
-//        if ((self.arrayOfKeys.first as? String) != nil) {
-//            var result: [(key: String, value: V)]
-//            
-//            for arrayKey in self.arrayOfKeys {
-//                if (arrayKey as! String) == key {
-//                    result.append(arrayKey)
-//                }
-//            }
-//        } else {
-//            fatalError("arrayOfKeys does not contain String type!")
-//        }
-//    }
-//}

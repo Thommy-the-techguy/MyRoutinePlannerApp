@@ -47,10 +47,6 @@ class MorningOverviewViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         setupUI()
-        
-        let calendar = Calendar.current
-        
-        
     }
 
     private func setupUI() {
@@ -211,7 +207,7 @@ extension MorningOverviewViewController: UITableViewDataSource {
     private func removeNotificationIfPrefferenceIsOff() {
         if !isPreffered {
             UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-                var identifiers: [String] = ["morning-notification"]
+                let identifiers: [String] = ["morning-notification"]
                 UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
             }
         }

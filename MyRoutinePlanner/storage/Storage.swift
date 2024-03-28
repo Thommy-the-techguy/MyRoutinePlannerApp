@@ -8,7 +8,7 @@
 import UIKit
 
 final class Storage: NSObject {
-    static var inboxData: [String:KeyValuePairsWithFlag<String, Date>] = [:]
+    static var inboxData: [String:KeyValuePairsWithFlag<String, Date, Priority>] = [:]
 //    static var inboxData: KeyValuePairsWithFlag<String, KeyValuePairsWithFlag<String, Date>> = KeyValuePairsWithFlag()
     
     static var completedTasksData: CodableKeyValuePairs<String, Date> = CodableKeyValuePairs()
@@ -213,18 +213,12 @@ final class Storage: NSObject {
         print("STORAGE READ")
         let decoder = JSONDecoder()
         if let savedData = UserDefaults.standard.object(forKey: "TodayTasks") as? Data {
-            if let loadedData = try? decoder.decode([String:KeyValuePairsWithFlag<String, Date>].self, from: savedData) {
+            if let loadedData = try? decoder.decode([String:KeyValuePairsWithFlag<String, Date, Priority>].self, from: savedData) {
                 Storage.inboxData = loadedData
                 
                 
                 print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
             }
-//            if let loadedData = try? decoder.decode(KeyValuePairsWithFlag<String, KeyValuePairsWithFlag<String, Date>>.self, from: savedData) {
-//                Storage.inboxData = loadedData
-//                
-//                
-//                print("data has been loaded.\nStorage Data: \(Storage.inboxData)")
-//            }
         }
         
         readTextSizePreferences(decoder: decoder, keyToUse: "TextSizePreferences")
@@ -298,9 +292,9 @@ final class Storage: NSObject {
             
             for (key, value) in Storage.inboxData {
                 for i in 0..<value.count {
-                    let (text, date, reminder) = value.getKeyAndValue(for: i)
+                    let (text, date, reminder, priority) = value.getKeyAndValue(for: i)
                     if messagesForRemoval.contains(text) && datesForRemoval.contains(date) && (reminder != nil) {
-                        Storage.inboxData[key]?.setKeyAndValue(for: i, key: text, value: date, withReminder: nil)
+                        Storage.inboxData[key]?.setKeyAndValue(for: i, key: text, value: date, withReminder: nil, priority: priority)
                         print("\n\n\nREMOVING REMINDER \(i) \(key) \(date)\n\n\n")
                     }
                 }

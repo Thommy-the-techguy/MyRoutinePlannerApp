@@ -13,33 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let storage = Storage()
     
-//    func dispatchNotification() {
-//        let identifier = "morning-notification"
-//        let title = "Time to check your tasks"
-//        let body = "Don't forget to check your tasks for today!"
-//        let hour = 8
-//        let minute = 0
-//        let isDaily = true
-//        
-//        let notificationCenter = UNUserNotificationCenter.current()
-//        
-//        let content = UNMutableNotificationContent()
-//        content.title = title
-//        content.body = body
-//        content.sound = .default
-//        
-//        let calendar = Calendar.current
-//        var dateComponents = DateComponents(calendar: calendar, timeZone: TimeZone.current)
-//        dateComponents.hour = hour
-//        dateComponents.minute = minute
-//        
-//        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: isDaily)
-//        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-//        
-//        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
-//        notificationCenter.add(request)
-//    }
-    
     func startAlarmCleaningThread() {
         DispatchQueue.global(qos: .userInitiated).async {
             let group = DispatchGroup()
@@ -52,12 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 group.leave()
                 group.wait()
                 
-//                if self.storage.shouldRemoveReminders {
-//                    print("True branch: \(self.storage.shouldRemoveReminders)")
-////                    self.postReloadDataNotification()
-//                } else {
-//                    print("False branch: \(self.storage.shouldRemoveReminders)")
-//                }
                 
                 sleep(5) // time in seconds
             }
@@ -69,8 +36,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
             if granted {
                 DispatchQueue.main.async {
-//                    UIApplication.shared.registerForRemoteNotifications()
-//                    self.dispatchNotification()
                     print("Permission for push notifications granted.")
                 }
             } else {
@@ -97,16 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-    func applicationWillTerminate(_ application: UIApplication) {
-        //        NotificationCenter.default.post(Notification(name: Notification.Name("AppAboutToTerminate")))
-//        let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-//                // Handle expiration if needed
-//        })
-            
+    func applicationWillTerminate(_ application: UIApplication) {            
         NotificationCenter.default.post(Notification(name: Notification.Name("AppAboutToTerminate")))
-
-            
-//        // End the background task
-//        UIApplication.shared.endBackgroundTask(backgroundTask)
     }
 }

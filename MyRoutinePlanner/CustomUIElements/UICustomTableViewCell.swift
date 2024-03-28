@@ -14,7 +14,6 @@ class UICustomTableViewCell: UITableViewCell {
     private let label: UILabel = {
         let configuratedLabel = UILabel()
         configuratedLabel.numberOfLines = 0
-//        configuratedLabel.font = .systemFont(ofSize: 18)
         configuratedLabel.font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
         configuratedLabel.textAlignment = .justified
         return configuratedLabel
@@ -73,7 +72,6 @@ class UICustomTableViewCell: UITableViewCell {
         self.date = date
         if #available(iOS 15, *) {
             dateTextLabel.text = self.date?.formatted(date: .numeric, time: .omitted)
-//            dateTextLabel.text = date.formatted(Date.FormatStyle.dateTime)
         } else {
             dateTextLabel.text = self.date?.description
         }
@@ -122,7 +120,6 @@ class UICustomTableViewCell: UITableViewCell {
             label.leadingAnchor.constraint(equalTo: self.checkButton.trailingAnchor, constant: 15.0),
             label.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -15.0),
             label.topAnchor.constraint(equalTo: self.contentView.topAnchor),
-//            label.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
             label.bottomAnchor.constraint(equalTo: self.dateTextLabel.topAnchor),
             
             

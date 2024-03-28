@@ -13,7 +13,6 @@ class UISettingsTableViewCell: UITableViewCell {
     private let label: UILabel = {
         let configuratedLabel = UILabel()
         configuratedLabel.numberOfLines = 0
-//        configuratedLabel.font = .systemFont(ofSize: 18)
         configuratedLabel.font = .systemFont(ofSize: CGFloat(Storage.textSizePreference))
         configuratedLabel.textAlignment = .justified
         return configuratedLabel

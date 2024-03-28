@@ -21,8 +21,6 @@ class NotificationsViewController: UIViewController {
         return configuredTitleLabel
     }()
     
-//    let tableViewLabelForSettingsApp = "ENABLE NOTIFICATIONS"
-    
     var tableView: UITableView!
     
     var footerTextEnabled = "Push notifications for MyRoutinePlanner are turned off. To turn them on, visit the Settings app."
@@ -74,7 +72,6 @@ class NotificationsViewController: UIViewController {
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dismissView))
         
-//        self.title = "Text Size"
         //title
         navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
     }
