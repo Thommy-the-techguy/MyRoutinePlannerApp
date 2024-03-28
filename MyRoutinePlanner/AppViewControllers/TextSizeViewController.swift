@@ -91,7 +91,6 @@ class TextSizeViewController: UIViewController {
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dismissViewAndSaveChangesIfPresent))
         
-//        self.title = "Text Size"
         //title
         navigationController?.navigationBar.topItem?.titleView = viewControllerTitleLabel
     }
@@ -113,15 +112,5 @@ class TextSizeViewController: UIViewController {
         let newSize = sender.value
         textSizeLabel.font = .systemFont(ofSize: CGFloat(newSize))
     }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

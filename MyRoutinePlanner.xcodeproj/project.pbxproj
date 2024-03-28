@@ -27,6 +27,8 @@
 		ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */; };
 		ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */; };
 		ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */; };
+		ACA4AFFE2BB5B34A0034F1C5 /* Priority.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */; };
+		ACA4B0022BB5C1450034F1C5 /* IntegerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA4B0012BB5C1450034F1C5 /* IntegerPickerView.swift */; };
 		ACAF06822B8115C80065A2EA /* KeyValuePairsWithFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */; };
 		ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */; };
 		ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */; };
@@ -59,6 +61,8 @@
 		ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxTabViewController.swift; sourceTree = "<group>"; };
 		ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedTabViewController.swift; sourceTree = "<group>"; };
 		ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabViewController.swift; sourceTree = "<group>"; };
+		ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Priority.swift; sourceTree = "<group>"; };
+		ACA4B0012BB5C1450034F1C5 /* IntegerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegerPickerView.swift; sourceTree = "<group>"; };
 		ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValuePairsWithFlag.swift; sourceTree = "<group>"; };
 		ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICellAccessoryCheckbox.swift; sourceTree = "<group>"; };
 		ACC2A7E82B55C1BE00582ECB /* AddActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityViewController.swift; sourceTree = "<group>"; };
@@ -145,6 +149,7 @@
 				ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */,
 				ACC2A7EC2B56A5E400582ECB /* UICustomTableViewCell.swift */,
 				AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */,
+				ACA4B0012BB5C1450034F1C5 /* IntegerPickerView.swift */,
 			);
 			path = CustomUIElements;
 			sourceTree = "<group>";
@@ -166,6 +171,7 @@
 				ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */,
 				AC9320352BB190500034ADE4 /* Reminder.swift */,
 				AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */,
+				ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */,
 			);
 			path = CustomStructures;
 			sourceTree = "<group>";
@@ -249,6 +255,7 @@
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
 				AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
+				ACA4AFFE2BB5B34A0034F1C5 /* Priority.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,
 				ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */,
 				AC2407052BB482C1000611D2 /* MorningOverviewViewController.swift in Sources */,
@@ -265,6 +272,7 @@
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 				AC9521762BB2D570007092AC /* Savable.swift in Sources */,
 				AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */,
+				ACA4B0022BB5C1450034F1C5 /* IntegerPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

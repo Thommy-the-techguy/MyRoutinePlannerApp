@@ -34,3 +34,7 @@ extension Date: Savable {
 extension [String]: Savable {
     
 }
+
+extension Priority: Savable {
+    
+}

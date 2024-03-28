@@ -49,11 +49,26 @@ class AddActivityWithDateViewController: UIViewController {
         
         return configuratedView
     }()
+    let priorityToggleView: UIView = {
+        let configuratedView = UIView()
+        configuratedView.backgroundColor = .white
+        configuratedView.layer.cornerRadius = 10.0
+        
+        return configuratedView
+    }()
     let timePicker: UIDatePicker = {
         let configuredTimePicker = UIDatePicker()
         configuredTimePicker.datePickerMode = .time
         
         return configuredTimePicker
+    }()
+    let priorityPicker: IntegerPickerView = {
+        let configuredIntegerPicker = IntegerPickerView()
+        configuredIntegerPicker.numbers = [1, 2, 3, 4]
+        configuredIntegerPicker.selectRow(3, inComponent: 0, animated: false)
+        configuredIntegerPicker.layer.borderWidth = 0
+        
+        return configuredIntegerPicker
     }()
     let timePickerLabel: UILabel = {
         let configuredLabel = UILabel()
@@ -64,6 +79,15 @@ class AddActivityWithDateViewController: UIViewController {
         
         return configuredLabel
     }()
+    let priorityPickerLabel: UILabel = {
+        let configuratedLabel = UILabel()
+        configuratedLabel.text = "Priority:"
+        
+        let fontSize = Storage.textSizePreference
+        configuratedLabel.font = .systemFont(ofSize: CGFloat(fontSize))
+        
+        return configuratedLabel
+    }()
     let notificationOptionView: UIView = {
         let configuratedView = UIView()
         configuratedView.backgroundColor = .white
@@ -72,7 +96,15 @@ class AddActivityWithDateViewController: UIViewController {
         
         return configuratedView
     }()
-    let switchControlLabel: UILabel = {
+    let priorityOptionView: UIView = {
+        let configuratedView = UIView()
+        configuratedView.backgroundColor = .white
+        configuratedView.layer.cornerRadius = 10.0
+        configuratedView.isHidden = true
+        
+        return configuratedView
+    }()
+    let notificationSwitchControlLabel: UILabel = {
         let configuredLabel = UILabel()
         configuredLabel.text = "Send notification"
         
@@ -81,7 +113,22 @@ class AddActivityWithDateViewController: UIViewController {
         
         return configuredLabel
     }()
-    var switchControl: UISwitch = {
+    var notificationSwitchControl: UISwitch = {
+        let configuredSwitch = UISwitch(frame: CGRect(x: 0, y: 0, width: 150, height: 150))
+        configuredSwitch.isOn = false
+        
+        return configuredSwitch
+    }()
+    let prioritySwitchControlLabel: UILabel = {
+        let configuredLabel = UILabel()
+        configuredLabel.text = "Set priority"
+        
+        let fontSize = Storage.textSizePreference
+        configuredLabel.font = .systemFont(ofSize: CGFloat(fontSize))
+        
+        return configuredLabel
+    }()
+    var prioritySwitchControl: UISwitch = {
         let configuredSwitch = UISwitch(frame: CGRect(x: 0, y: 0, width: 150, height: 150))
         configuredSwitch.isOn = false
         
@@ -139,6 +186,25 @@ class AddActivityWithDateViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    init(initialTextViewText: String, initialTitle: String, initialFlag: Reminder?, initialPriority: Priority) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.withReminder = initialFlag
+        self.priorityPicker.selectRow(initialPriority.getPriorityLevel() - 1, inComponent: 0, animated: false)
+        // TODO: when moving to another date remain previous time
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.datePicker.date = initialDate
+        self.withReminder = initialFlag
+        self.priorityPicker.selectRow(initialPriority.getPriorityLevel() - 1, inComponent: 0, animated: false)
+        // TODO: when moving to another date remain previous time
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -178,13 +244,19 @@ class AddActivityWithDateViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
-    private func setupSwitchControl() {
+    private func setupSwitchControls() {
         if withReminder != nil {
-            switchControl.isOn = true
+            notificationSwitchControl.isOn = true
             self.notificationOptionView.isHidden = false
         }
         
-        switchControl.addTarget(self, action: #selector(showReminderTimePicker(sender: )), for: .valueChanged)
+        if priorityPicker.selectedInteger != 4 {
+            prioritySwitchControl.isOn = true
+            priorityOptionView.isHidden = false
+        }
+        
+        notificationSwitchControl.addTarget(self, action: #selector(showReminderTimePicker(sender: )), for: .valueChanged)
+        prioritySwitchControl.addTarget(self, action: #selector(showPriorityIntegerPicker(sender:)), for: .valueChanged)
     }
     
     @objc private func showReminderTimePicker(sender: UISwitch) {
@@ -194,6 +266,14 @@ class AddActivityWithDateViewController: UIViewController {
         } else {
             self.notificationOptionView.isHidden = true
             self.withReminder = nil
+        }
+    }
+    
+    @objc private func showPriorityIntegerPicker(sender: UISwitch) {
+        if sender.isOn {
+            self.priorityOptionView.isHidden = false
+        } else {
+            self.priorityOptionView.isHidden = true
         }
     }
     
@@ -219,15 +299,23 @@ class AddActivityWithDateViewController: UIViewController {
     }
     
     private func setupNotificationToggleView() {
-//        view.addSubview(notificationToggleView)
-        notificationToggleView.addSubview(switchControlLabel)
-        notificationToggleView.addSubview(switchControl)
+        notificationToggleView.addSubview(notificationSwitchControlLabel)
+        notificationToggleView.addSubview(notificationSwitchControl)
     }
     
     private func setupNotificationOptionView() {
-//        view.addSubview(notificationOptionView)
         notificationOptionView.addSubview(timePickerLabel)
         notificationOptionView.addSubview(timePicker)
+    }
+    
+    private func setupPriorityToggleView() {
+        priorityToggleView.addSubview(prioritySwitchControlLabel)
+        priorityToggleView.addSubview(prioritySwitchControl)
+    }
+    
+    private func setupPriorityOptionView() {
+        priorityOptionView.addSubview(priorityPickerLabel)
+        priorityOptionView.addSubview(priorityPicker)
     }
     
     private func configureTextView() {
@@ -291,9 +379,11 @@ class AddActivityWithDateViewController: UIViewController {
         configureTextView()
         configureContentView()
         configureScrollView()
-        setupSwitchControl()
+        setupSwitchControls()
         setupNotificationToggleView()
         setupNotificationOptionView()
+        setupPriorityToggleView()
+        setupPriorityOptionView()
         setupTimePicker()
 
         
@@ -301,6 +391,8 @@ class AddActivityWithDateViewController: UIViewController {
         contentView.addSubview(textView)
         contentView.addSubview(notificationToggleView)
         contentView.addSubview(notificationOptionView)
+        contentView.addSubview(priorityToggleView)
+        contentView.addSubview(priorityOptionView)
         scrollView.addSubview(contentView)
         view.addSubview(scrollView)
         
@@ -310,11 +402,18 @@ class AddActivityWithDateViewController: UIViewController {
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         textView.translatesAutoresizingMaskIntoConstraints = false
         notificationToggleView.translatesAutoresizingMaskIntoConstraints = false
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        switchControlLabel.translatesAutoresizingMaskIntoConstraints = false
+        notificationSwitchControl.translatesAutoresizingMaskIntoConstraints = false
+        notificationSwitchControlLabel.translatesAutoresizingMaskIntoConstraints = false
         timePicker.translatesAutoresizingMaskIntoConstraints = false
         timePickerLabel.translatesAutoresizingMaskIntoConstraints = false
         notificationOptionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        priorityToggleView.translatesAutoresizingMaskIntoConstraints = false
+        prioritySwitchControl.translatesAutoresizingMaskIntoConstraints = false
+        prioritySwitchControlLabel.translatesAutoresizingMaskIntoConstraints = false
+        priorityPicker.translatesAutoresizingMaskIntoConstraints = false
+        priorityPickerLabel.translatesAutoresizingMaskIntoConstraints = false
+        priorityOptionView.translatesAutoresizingMaskIntoConstraints = false
         
 
         NSLayoutConstraint.activate([
@@ -350,16 +449,16 @@ class AddActivityWithDateViewController: UIViewController {
             notificationToggleView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
             
             
-            switchControlLabel.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor),
-            switchControlLabel.trailingAnchor.constraint(equalTo: self.switchControl.leadingAnchor),
-            switchControlLabel.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
-            switchControlLabel.leadingAnchor.constraint(equalTo: self.notificationToggleView.leadingAnchor, constant: 10.0),
+            notificationSwitchControlLabel.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor),
+            notificationSwitchControlLabel.trailingAnchor.constraint(equalTo: self.notificationSwitchControl.leadingAnchor),
+            notificationSwitchControlLabel.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
+            notificationSwitchControlLabel.leadingAnchor.constraint(equalTo: self.notificationToggleView.leadingAnchor, constant: 10.0),
             
             
-            switchControl.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor, constant: 7.5),
-            switchControl.trailingAnchor.constraint(equalTo: self.notificationToggleView.trailingAnchor, constant: -10.0),
-            switchControl.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
-            switchControl.leadingAnchor.constraint(equalTo: self.switchControlLabel.trailingAnchor),
+            notificationSwitchControl.topAnchor.constraint(equalTo: self.notificationToggleView.topAnchor, constant: 7.5),
+            notificationSwitchControl.trailingAnchor.constraint(equalTo: self.notificationToggleView.trailingAnchor, constant: -10.0),
+            notificationSwitchControl.bottomAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor),
+            notificationSwitchControl.leadingAnchor.constraint(equalTo: self.notificationSwitchControlLabel.trailingAnchor),
             
             
             notificationOptionView.topAnchor.constraint(equalTo: self.notificationToggleView.bottomAnchor, constant: 15.0),
@@ -378,6 +477,45 @@ class AddActivityWithDateViewController: UIViewController {
             timePicker.trailingAnchor.constraint(equalTo: self.notificationOptionView.trailingAnchor, constant: -10.0),
             timePicker.bottomAnchor.constraint(equalTo: self.notificationOptionView.bottomAnchor),
             timePicker.leadingAnchor.constraint(equalTo: self.timePickerLabel.trailingAnchor),
+            
+            
+            
+            
+            priorityToggleView.topAnchor.constraint(equalTo: self.notificationOptionView.bottomAnchor, constant: 15.0),
+            priorityToggleView.trailingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.trailingAnchor),
+            priorityToggleView.bottomAnchor.constraint(equalTo: self.priorityToggleView.topAnchor, constant: 45.0),
+            priorityToggleView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
+            
+            
+            prioritySwitchControlLabel.topAnchor.constraint(equalTo: self.priorityToggleView.topAnchor),
+            prioritySwitchControlLabel.trailingAnchor.constraint(equalTo: self.priorityToggleView.trailingAnchor, constant: -10.0),
+            prioritySwitchControlLabel.bottomAnchor.constraint(equalTo: self.priorityToggleView.bottomAnchor),
+            prioritySwitchControlLabel.leadingAnchor.constraint(equalTo: self.priorityToggleView.leadingAnchor, constant: 10.0),
+            
+            
+            prioritySwitchControl.topAnchor.constraint(equalTo: self.priorityToggleView.topAnchor, constant: 7.5),
+            prioritySwitchControl.trailingAnchor.constraint(equalTo: self.priorityToggleView.trailingAnchor, constant: -10.0),
+            prioritySwitchControl.bottomAnchor.constraint(equalTo: self.priorityToggleView.bottomAnchor, constant: -7.5),
+            prioritySwitchControl.widthAnchor.constraint(equalToConstant: 50.0),
+            
+            
+            priorityOptionView.topAnchor.constraint(equalTo: self.priorityToggleView.bottomAnchor, constant: 15.0),
+            priorityOptionView.trailingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.trailingAnchor),
+            priorityOptionView.bottomAnchor.constraint(equalTo: self.priorityOptionView.topAnchor, constant: 45.0),
+            priorityOptionView.leadingAnchor.constraint(equalTo: self.scrollView.layoutMarginsGuide.leadingAnchor),
+            
+            
+            priorityPickerLabel.topAnchor.constraint(equalTo: self.priorityOptionView.topAnchor),
+            priorityPickerLabel.trailingAnchor.constraint(equalTo: self.priorityPicker.leadingAnchor),
+            priorityPickerLabel.bottomAnchor.constraint(equalTo: self.priorityOptionView.bottomAnchor),
+            priorityPickerLabel.leadingAnchor.constraint(equalTo: self.priorityOptionView.leadingAnchor, constant: 10.0),
+
+            
+            priorityPicker.topAnchor.constraint(equalTo: self.priorityOptionView.topAnchor),
+            priorityPicker.trailingAnchor.constraint(equalTo: self.priorityOptionView.trailingAnchor),
+            priorityPicker.bottomAnchor.constraint(equalTo: self.priorityOptionView.bottomAnchor),
+            priorityPicker.leadingAnchor.constraint(equalTo: self.priorityPickerLabel.trailingAnchor),
+            priorityPicker.widthAnchor.constraint(equalToConstant: 100.0),
         ])
     }
     
@@ -401,7 +539,10 @@ class AddActivityWithDateViewController: UIViewController {
             if !self.notificationOptionView.isHidden {
                 withReminder = createReminder()
             }
-            delegate?.saveNewTask(self.textView.text, taskDate: datePicker.date, withReminder: withReminder)
+            
+            let priority = Priority(priorityLevel: priorityPicker.selectedInteger!)
+            delegate?.saveNewTask(self.textView.text, taskDate: datePicker.date, withReminder: withReminder, priority: priority)
+            
             addReminder()
             dismiss(animated: true)
         }
@@ -464,7 +605,11 @@ class AddActivityWithDateViewController: UIViewController {
                 self.withReminder = createReminder()
                 self.withReminder?.reminderIdentifier = reminderIdentifier
             }
-            delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date, withReminder: withReminder)
+            
+            let priority = Priority(priorityLevel: priorityPicker.selectedInteger!)
+            print("SELECTED INTEGER: \(priorityPicker.selectedInteger)")
+            delegate?.editSelectedTask(taskText: self.textView.text, taskDate: datePicker.date, withReminder: withReminder, priority: priority)
+            
             addReminder()
             dismiss(animated: true)
         }
