@@ -11,7 +11,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
@@ -22,14 +21,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.windowScene = windowScene
         window?.makeKeyAndVisible()
         
+        // notify storage that app has been loaded
+        NotificationCenter.default.post(Notification(name: Notification.Name("AppLoaded")))
+        
         // creating view controllers
-        let (todayTabVC, inboxTabVC, searchTabVC, browseTabVC) = (TodayTabViewController(), InboxTabViewController(), SearchTabViewController(), BrowseTabViewController())
+        let (todayTabVC, inboxTabVC, searchTabVC, browseTabVC) = (TodayTabViewController(), InboxTabViewController(), CompletedTabViewController(), SettingsTabViewController())
         
         // setting tab bar items title and image
         todayTabVC.tabBarItem = UITabBarItem(title: "Today", image: UIImage(systemName: "calendar"), tag: 0)
         inboxTabVC.tabBarItem = UITabBarItem(title: "Inbox", image: UIImage(systemName: "tray"), tag: 1)
-        searchTabVC.tabBarItem = UITabBarItem(title: "Search", image: UIImage(systemName: "magnifyingglass"), tag: 2)
-        browseTabVC.tabBarItem = UITabBarItem(title: "Browse", image: UIImage(systemName: "folder"), tag: 3)
+        searchTabVC.tabBarItem = UITabBarItem(title: "Completed", image: UIImage(systemName: "checkmark.circle"), tag: 2)
+        browseTabVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gear"), tag: 3)
         
         // creating corresponding navigation controllers
         let (navControllerTodayTab, navControllerInboxTab, navControllerSearchTab, navControllerBrowseTab) = (UINavigationController(rootViewController: todayTabVC), UINavigationController(rootViewController: inboxTabVC), UINavigationController(rootViewController: searchTabVC), UINavigationController(rootViewController: browseTabVC))
@@ -61,6 +63,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+//        NotificationCenter.default.post(Notification(name: Notification.Name("AppLoaded")))
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -78,7 +81,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-
-
 }
 
