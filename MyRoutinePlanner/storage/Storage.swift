@@ -51,63 +51,43 @@ final class Storage: NSObject {
         return true
     }
     
-    private func removeInvalidTasks() {
-        let todayTasks = Storage.inboxData["Today"]
-        let tomorrowTasks = Storage.inboxData["Tomorrow"]
-        
+    private func rearrangeTasks() {
+        for (key, values) in Storage.inboxData {
+            let checkedDate = values.getValue(for: 0)
+            
+            if !checkIfTaskIsValidByDate(checkedDate) {
+                Storage.inboxData[key] = nil
+            } else {
+                let dateKey = determineDateKey(checkedDate)
+                
+                if dateKey == "Today" {
+                    Storage.inboxData["Today"] = Storage.inboxData[key]
+                    Storage.inboxData[key] = nil
+                } else if dateKey == "Tomorrow" {
+                    Storage.inboxData["Tomorrow"] = Storage.inboxData[key]
+                    Storage.inboxData[key] = nil
+                }
+            }
+            
+        }
+    }
+    
+    private func determineDateKey(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .full
         dateFormatter.timeStyle = .none
         
-        let dayAfterTomorrow = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!
-        let dayAfterTomorrowInString = dateFormatter.string(from: dayAfterTomorrow)
+        let dateString = dateFormatter.string(from: date)
+        let todayDateString = dateFormatter.string(from: Date())
+        let tomorrowDateString = dateFormatter.string(from: (Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!))
         
-        let dayAfterTomorrowTasks = Storage.inboxData[dayAfterTomorrowInString]
-        
-        if let todayTasks {
-            if tomorrowTasks != nil {
-                if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
-                    moveTommorowToToday()
-                    return
-                }
-            } else {
-                if checkIfTaskIsValidByDate(todayTasks.getValue(for: 0)) == false {
-                    removeTodayTasks()
-                    return
-                }
-            }
-            
-        } else if let tomorrowTasks {
-            let todayDateInString = dateFormatter.string(from: Date())
-            let todayDateWithoutTime = dateFormatter.date(from: todayDateInString)
-            
-            let tomorrowDateInString = dateFormatter.string(from: tomorrowTasks.getValue(for: 0))
-            let tomorrowDateWithoutTime = dateFormatter.date(from: tomorrowDateInString)
-            
-            
-            if todayTasks == nil && tomorrowDateWithoutTime == todayDateWithoutTime {
-                moveTommorowToToday()
-                return
-            }
-        } else if let dayAfterTomorrowTasks {
-            moveTommorowToToday()
-            return
-        }
-    }
-    
-    private func removeTodayTasks() {
-        Storage.inboxData["Today"] = nil
-    }
-    
-    private func moveTommorowToToday() {
-        Storage.inboxData["Today"] = Storage.inboxData["Tomorrow"]
-        
-        let (dayAfterTomorrowIsPresent, tomorrowDateKey) = checkIfDayAfterTomorrowIsPresent()
-        if dayAfterTomorrowIsPresent {
-            Storage.inboxData["Tomorrow"] = Storage.inboxData[tomorrowDateKey]
-            Storage.inboxData[tomorrowDateKey] = nil
-        } else {
-            Storage.inboxData["Tomorrow"] = nil
+        switch dateString {
+            case todayDateString:
+                return "Today"
+            case tomorrowDateString:
+                return "Tomorrow"
+            default:
+                return dateString
         }
     }
     
@@ -225,7 +205,8 @@ final class Storage: NSObject {
         readEveningNotificationPreferences(decoder: decoder, keyToUse: "EveningNotificationPreference")
         
         print("REMOVING INVALID TASKS")
-        removeInvalidTasks()
+//        removeInvalidTasks()
+        rearrangeTasks()
         removeInvalidReminders()
         
         print("CLEANING COMPLETED TASKS")
