@@ -249,7 +249,7 @@ extension InboxTabViewController: UITableViewDataSource {
         let accessoryButton = UIButton()
         accessoryButton.frame = CGRect(x: 0, y: 0, width: Int(imageSize), height: Int(imageSize)) // replace magic constants
 
-        let reminderButtonImage = UIImage(systemName: "bell.badge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
+        let reminderButtonImage = UIImage(systemName: "bell.badge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(imageSize)))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
 
         accessoryButton.setImage(reminderButtonImage, for: .normal)
 
@@ -473,12 +473,19 @@ extension InboxTabViewController: UITableViewDelegate {
 
 extension InboxTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
-        // TODO: Implement colors and checkmark.circle of color according to Storage.data
-        sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
-        
         let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.inboxData.keys)
         let currentKey: String = arrayOfDataDictKeys[indexPath.section]
         print("current key: \(currentKey) row: \(indexPath.row) section: \(indexPath.section)")
+        
+        // checked circle color set
+        let buttonsColor = (Storage.inboxData[currentKey]?.getPriority(for: indexPath.row).getPriorityColor())!
+        
+        let imageSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        
+        let checkButtonImage = UIImage(systemName: "checkmark.circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(imageSize)))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
+        
+        sender.setImage(checkButtonImage, for: .normal)
+        
         let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
         cancelNotification(cell: cell)
         

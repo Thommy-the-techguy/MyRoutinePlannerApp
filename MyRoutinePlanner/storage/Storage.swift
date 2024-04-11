@@ -137,10 +137,8 @@ final class Storage: NSObject {
         saveUserData(encoder: encoder, keyToSaveUnder: "CompletedTasks", dataToSave: Storage.completedTasksData)
         
         saveUserData(encoder: encoder, keyToSaveUnder: "MorningNotificationPreference", dataToSave: Storage.morningNotificationPreference)
-//        saveUserData(encoder: encoder, keyToSaveUnder: "MorningNotificationTime", dataToSave: Storage.morningNotificationTime)
         
         saveUserData(encoder: encoder, keyToSaveUnder: "EveningNotificationPreference", dataToSave: Storage.eveningNotificationPreference)
-//        saveUserData(encoder: encoder, keyToSaveUnder: "EveningNotificationTime", dataToSave: Storage.eveningNotificationTime)
     }
     
     private func saveUserData(encoder: JSONEncoder, keyToSaveUnder: String, dataToSave: Savable) {

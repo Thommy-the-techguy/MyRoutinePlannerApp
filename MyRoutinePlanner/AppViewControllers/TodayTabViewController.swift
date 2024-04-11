@@ -146,7 +146,7 @@ extension TodayTabViewController: UITableViewDataSource {
         // change buttons sizes
         let buttonsColor = (Storage.inboxData["Today"]?.getPriority(for: indexPath.row).getPriorityColor())!
         
-        let checkButtonImage = UIImage(systemName: "circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(Int(imageSize))))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
+        let checkButtonImage = UIImage(systemName: "circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(imageSize)))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
         cell.getCheckButton().setImage(checkButtonImage, for: .normal)
         
         
@@ -311,7 +311,14 @@ extension TodayTabViewController: UITableViewDelegate {
 
 extension TodayTabViewController: CustomTableViewCellDelegate {
     func removeCheckedRow(sender: UIButton, indexPath: IndexPath) {
-        sender.setImage(UIImage(systemName: "checkmark.circle"), for: .normal)
+        // checked circle color set
+        let buttonsColor = (Storage.inboxData["Today"]?.getPriority(for: indexPath.row).getPriorityColor())!
+        
+        let imageSize = Storage.textSizePreference < 17.0 ? 17.0 : Storage.textSizePreference
+        
+        let checkButtonImage = UIImage(systemName: "checkmark.circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: CGFloat(imageSize)))?.withTintColor(buttonsColor, renderingMode: .alwaysOriginal)
+        
+        sender.setImage(checkButtonImage, for: .normal)
         
         let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
         cancelNotification(cell: cell)
