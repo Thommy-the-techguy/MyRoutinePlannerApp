@@ -9,9 +9,6 @@ import UIKit
 
 class TextSizeViewController: UIViewController {
     let defaultTextSize = 17.0
-//    var currentTextSize: Double = {
-//        return Storage.textSizePreference
-//    }()
     
     let textSizeLabel: UILabel = {
         let configuredLabel = UILabel()

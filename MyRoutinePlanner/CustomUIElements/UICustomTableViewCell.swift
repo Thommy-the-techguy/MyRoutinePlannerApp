@@ -64,11 +64,11 @@ class UICustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setText(_ text: String) {
+    func setText(_ text: String?) {
         self.label.text = text
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date?) {
         self.date = date
         if #available(iOS 15, *) {
             dateTextLabel.text = self.date?.formatted(date: .numeric, time: .omitted)

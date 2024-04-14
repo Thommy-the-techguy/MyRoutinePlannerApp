@@ -35,6 +35,6 @@ extension [String]: Savable {
     
 }
 
-extension Priority: Savable {
-    
-}
+//extension Priority: Savable {
+//    
+//}

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Reminder {
+final class Reminder1 {
     var reminderDate: Date
     var reminderIdentifier: String
     
@@ -17,12 +17,12 @@ final class Reminder {
     }
 }
 
-extension Reminder: Codable {
+extension Reminder1: Codable {
     
 }
 
-extension Reminder: Equatable {
-    static func == (lhs: Reminder, rhs: Reminder) -> Bool {
+extension Reminder1: Equatable {
+    static func == (lhs: Reminder1, rhs: Reminder1) -> Bool {
         return lhs.reminderDate == rhs.reminderDate && lhs.reminderIdentifier == rhs.reminderIdentifier
     }
 }
