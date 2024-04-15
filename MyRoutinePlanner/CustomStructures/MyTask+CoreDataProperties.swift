@@ -18,6 +18,7 @@ extension MyTask {
 
     @NSManaged public var taskTitle: String?
     @NSManaged public var taskDate: Date?
+    @NSManaged public var taskOrderIndex: Int64
     @NSManaged public var taskReminderRel: Reminder?
     @NSManaged public var taskPriorityRel: Priority?
 

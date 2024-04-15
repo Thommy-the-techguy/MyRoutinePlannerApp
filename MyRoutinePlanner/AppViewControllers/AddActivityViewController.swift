@@ -376,6 +376,7 @@ class AddActivityViewController: UIViewController {
             task.taskDate = Date()
             task.taskReminderRel = withReminder
             task.taskPriorityRel = priority
+            task.taskOrderIndex = Storage.storageData["Today"]?.count != nil ? Int64((Storage.storageData["Today"]?.count)!) : 0
             
             do {
                 try context.save()

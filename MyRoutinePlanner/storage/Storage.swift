@@ -33,6 +33,9 @@ final class Storage: NSObject {
         let fetchRequest: NSFetchRequest<MyTask> = MyTask.fetchRequest()
         fetchRequest.relationshipKeyPathsForPrefetching = ["taskReminderRel", "taskPriorityRel"]
         fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "taskOrderIndex", ascending: true)
+        ]
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .full
@@ -80,7 +83,7 @@ final class Storage: NSObject {
     }
     
     private func appendOrAddTaskByKey(_ key: String, task: MyTask) {
-        if let todayTasks = Storage.storageData[key] {
+        if Storage.storageData[key] != nil {
             Storage.storageData[key]?.append(task)
         } else {
             Storage.storageData[key] = [task]

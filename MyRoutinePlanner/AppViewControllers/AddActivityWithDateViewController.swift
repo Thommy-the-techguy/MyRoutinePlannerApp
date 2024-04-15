@@ -145,6 +145,10 @@ class AddActivityWithDateViewController: UIViewController {
     
     var initialTitle: String?
     
+    var initialDate: Date?
+    
+    var initialTaskOrderIndex: Int!
+    
     weak var delegate: AddActivityDelegate?
 
     init() {
@@ -165,6 +169,7 @@ class AddActivityWithDateViewController: UIViewController {
     init(initialTextViewText: String, initialTitle: String, initialDate: Date) {
         self.initialText = initialTextViewText
         self.initialTitle = initialTitle
+        self.initialDate = initialDate
         self.datePicker.date = initialDate
         super.init(nibName: nil, bundle: nil)
     }
@@ -180,6 +185,7 @@ class AddActivityWithDateViewController: UIViewController {
     init(initialTextViewText: String, initialTitle: String, initialDate: Date, initialFlag: Reminder?) {
         self.initialText = initialTextViewText
         self.initialTitle = initialTitle
+        self.initialDate = initialDate
         self.datePicker.date = initialDate
         self.withReminder = initialFlag
         // TODO: when moving to another date remain previous time
@@ -195,12 +201,35 @@ class AddActivityWithDateViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    init(initialTextViewText: String, initialTitle: String, initialFlag: Reminder?, initialPriority: Priority, initialTaskOrderIndex: Int) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.withReminder = initialFlag
+        self.priorityPicker.selectRow(Int(initialPriority.priorityLevel) - 1, inComponent: 0, animated: false)
+        self.initialTaskOrderIndex = initialTaskOrderIndex
+        // TODO: when moving to another date remain previous time
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     init(initialTextViewText: String, initialTitle: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority) {
         self.initialText = initialTextViewText
         self.initialTitle = initialTitle
+        self.initialDate = initialDate
         self.datePicker.date = initialDate
         self.withReminder = initialFlag
         self.priorityPicker.selectRow(Int(initialPriority.priorityLevel) - 1, inComponent: 0, animated: false)
+        // TODO: when moving to another date remain previous time
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(initialTextViewText: String, initialTitle: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority, initialTaskOrderIndex: Int) {
+        self.initialText = initialTextViewText
+        self.initialTitle = initialTitle
+        self.initialDate = initialDate
+        self.datePicker.date = initialDate
+        self.withReminder = initialFlag
+        self.priorityPicker.selectRow(Int(initialPriority.priorityLevel) - 1, inComponent: 0, animated: false)
+        self.initialTaskOrderIndex = initialTaskOrderIndex
         // TODO: when moving to another date remain previous time
         super.init(nibName: nil, bundle: nil)
     }
@@ -568,6 +597,26 @@ class AddActivityWithDateViewController: UIViewController {
             task.taskReminderRel = withReminder
             task.taskPriorityRel = priority
             
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .full
+            dateFormatter.timeStyle = .none
+            
+            let todayDateStringWOTime = dateFormatter.string(from: Date())
+            let tomorrowDateStringWOTime = dateFormatter.string(from: (Calendar.current.date(byAdding: DateComponents(day: 1), to: Date()))!)
+            let taskDateStringWOTime = dateFormatter.string(from: task.taskDate!)
+            
+            var key = ""
+            switch taskDateStringWOTime {
+                case todayDateStringWOTime:
+                    key = "Today"
+                case tomorrowDateStringWOTime:
+                    key = "Tomorrow"
+                default:
+                    key = taskDateStringWOTime
+            }
+            
+            task.taskOrderIndex = Storage.storageData[key]?.count != nil ? Int64((Storage.storageData[key]?.count)!) : 0
+            
             do {
                 try context.save()
             } catch {
@@ -664,6 +713,32 @@ class AddActivityWithDateViewController: UIViewController {
             task.taskDate = datePicker.date
             task.taskReminderRel = withReminder
             task.taskPriorityRel = priority
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .full
+            dateFormatter.timeStyle = .none
+            
+            let todayDateStringWOTime = dateFormatter.string(from: Date())
+            let tomorrowDateStringWOTime = dateFormatter.string(from: (Calendar.current.date(byAdding: DateComponents(day: 1), to: Date()))!)
+            let taskDateStringWOTime = dateFormatter.string(from: task.taskDate!)
+            
+            var key = ""
+            switch taskDateStringWOTime {
+                case todayDateStringWOTime:
+                    key = "Today"
+                case tomorrowDateStringWOTime:
+                    key = "Tomorrow"
+                default:
+                    key = taskDateStringWOTime
+            }
+            
+            if let initialDate {
+                if taskDateStringWOTime != dateFormatter.string(from: initialDate) {
+                    task.taskOrderIndex = Storage.storageData[key]?.count != nil ? Int64((Storage.storageData[key]?.count)!) : 0
+                } else {
+                    task.taskOrderIndex = Int64(initialTaskOrderIndex)
+                }
+            }
             
             do {
                 try context.save()

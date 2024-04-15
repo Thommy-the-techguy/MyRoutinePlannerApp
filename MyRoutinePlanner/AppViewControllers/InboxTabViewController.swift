@@ -344,8 +344,8 @@ extension InboxTabViewController: UITableViewDataSource {
 
     }
     
-    private func openEditView(initialTextViewText: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority) {
-        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialDate: initialDate, initialFlag: initialFlag, initialPriority: initialPriority)
+    private func openEditView(initialTextViewText: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority, initialTaskOrderIndex: Int) {
+        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialDate: initialDate, initialFlag: initialFlag, initialPriority: initialPriority, initialTaskOrderIndex: initialTaskOrderIndex)
         editActivityVC.delegate = self
         let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
         editActivityNavigationController.modalPresentationStyle = .formSheet
@@ -364,13 +364,17 @@ extension InboxTabViewController: UITableViewDataSource {
             let initialDate = (task?.taskDate)!
             let reminder = task?.taskReminderRel
             let priority = (task?.taskPriorityRel)!
+            let orderIndex = (task?.taskOrderIndex)!
             
-            self.openEditView(initialTextViewText: initialText, initialDate: initialDate, initialFlag: reminder, initialPriority: priority)
+            self.openEditView(initialTextViewText: initialText, initialDate: initialDate, initialFlag: reminder, initialPriority: priority, initialTaskOrderIndex: Int(orderIndex))
         })
         let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { [unowned self] (contextualAction, view, boolValue) in
             let arrayOfDataDictKeys = searching ? Array(filteredData.keys) : Array(Storage.storageData.keys)
             let currentKey: String = arrayOfDataDictKeys[indexPath.section]
             
+            let task = Storage.storageData[currentKey]?[indexPath.row]
+            
+            updateIndices(sectionKey: currentKey, removedIndex: Int((task?.taskOrderIndex)!))
             
             let cell = tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
             self.cancelNotification(cell: cell)
@@ -390,6 +394,16 @@ extension InboxTabViewController: UITableViewDataSource {
             
             DispatchQueue.main.async {
                 Storage().saveData()
+            }
+            
+            do {
+                let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                
+                context.delete(task!)
+                
+                try context.save()
+            } catch {
+                print("Ошибка сохранения: \(error.localizedDescription)")
             }
         })
 
@@ -425,6 +439,9 @@ extension InboxTabViewController: UITableViewDataSource {
             let dateComponents = Calendar.current.dateComponents([.day, .month, .year], from: destinationDate!)
             
             task?.taskDate = Calendar.current.date(from: dateComponents)!
+            updateIndices(sectionKey: currentKey, removedIndex: Int((task?.taskOrderIndex)!))
+            task?.taskOrderIndex = Storage.storageData[destinationKey]?.count != nil ? Int64((Storage.storageData[destinationKey]?.count)!) : 0
+            
             
             do {
                 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -447,7 +464,13 @@ extension InboxTabViewController: UITableViewDataSource {
             
         } else {
             let temp = Storage.storageData[currentKey]?[sourceRowIndex]
+            let tempTaskOrderIndex = temp?.taskOrderIndex
             let destinationKeyAndValue = Storage.storageData[destinationKey]?[destinationRowIndex]
+            let destinationTaskOrderIndex = destinationKeyAndValue?.taskOrderIndex
+            
+            
+            destinationKeyAndValue?.taskOrderIndex = tempTaskOrderIndex! // swap orderIndexes for CoreData
+            temp?.taskOrderIndex = destinationTaskOrderIndex!
             
             
             Storage.storageData[currentKey]?[sourceRowIndex] = destinationKeyAndValue!
@@ -456,6 +479,15 @@ extension InboxTabViewController: UITableViewDataSource {
             
             filteredData[currentKey]?[sourceRowIndex] = destinationKeyAndValue!
             filteredData[destinationKey]?[destinationRowIndex] = temp!
+            
+            
+            do {
+                let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                
+                try context.save()
+            } catch {
+                print("Ошибка сохранения: \(error.localizedDescription)")
+            }
         }
         
         // TODO: - maybe do it with delay
@@ -528,14 +560,20 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
         cancelNotification(cell: cell)
         
+        
         self.tableView.beginUpdates()
+        
         let task = Storage.storageData[currentKey]?[indexPath.row]
         let completedTask = Storage.storageData[currentKey]?[indexPath.row].taskTitle
         let timeOfCompletion = Date()
+        
+        updateIndices(sectionKey: currentKey, removedIndex: Int((task?.taskOrderIndex)!))
+        
         Storage.completedTasksData.append(key: completedTask!, value: timeOfCompletion)
         Storage.storageData[currentKey]?.remove(at: indexPath.row)
         filteredData[currentKey]?.remove(at: indexPath.row)
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
         self.tableView.endUpdates()
         
         do {
@@ -653,11 +691,13 @@ extension InboxTabViewController: AddActivityDelegate {
         
         guard Storage.storageData[key] != nil else {
             Storage.storageData[key] = [editedTask]
+
+            updateIndices(sectionKey: currentKey, removedIndex: Int((task?.taskOrderIndex)!))
             
             Storage.storageData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
             filteredData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
-            
-            do {
+
+            do { // deletes initial copy of a task (AddActivityVCWithDate creats the new one)
                 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
                 
                 context.delete(task!)
@@ -691,8 +731,20 @@ extension InboxTabViewController: AddActivityDelegate {
         print("\n\n\nhere\n\n\n")
         
         if taskDateInString != currentDateInString {
+            updateIndices(sectionKey: currentKey, removedIndex: Int((task?.taskOrderIndex)!))
+            
             Storage.storageData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
             filteredData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
+            
+            do {
+                let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                
+                context.delete(task!)
+                
+                try context.save()
+            } catch {
+                print("Saving error: editSelectedTask 545")
+            }
             
             Storage.storageData[key]?.append(editedTask)
             filteredData[key]?.append(editedTask)
@@ -708,6 +760,7 @@ extension InboxTabViewController: AddActivityDelegate {
             Storage.storageData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
             filteredData[currentKey]?.remove(at: (self.selectedRowIndexPath?.row)!)
             
+            
             do {
                 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
                 
@@ -717,6 +770,7 @@ extension InboxTabViewController: AddActivityDelegate {
             } catch {
                 print("Saving error: editSelectedTask 545")
             }
+            
             
             Storage.storageData[currentKey]?.insert(editedTask, at: (self.selectedRowIndexPath?.row)!)
             filteredData[currentKey]?.insert(editedTask, at: (self.selectedRowIndexPath?.row)!)
@@ -802,5 +856,17 @@ extension InboxTabViewController: UISearchBarDelegate {
             self.tableView.reloadData()
         }
         
+    }
+}
+
+extension InboxTabViewController {
+    private func updateIndices(sectionKey: String, removedIndex: Int) {
+        if let tasks = Storage.storageData[sectionKey] {
+            if tasks.count > removedIndex {
+                for i in removedIndex + 1..<tasks.count {
+                    tasks[i].taskOrderIndex -= 1
+                }
+            }
+        }
     }
 }

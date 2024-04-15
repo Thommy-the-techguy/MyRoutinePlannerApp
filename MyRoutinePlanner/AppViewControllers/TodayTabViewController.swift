@@ -228,8 +228,8 @@ extension TodayTabViewController: UITableViewDataSource {
         
     }
     
-    private func openEditView(initialTextViewText: String, initialFlag: Reminder?, initialPriority: Priority) {
-        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialFlag: initialFlag, initialPriority: initialPriority)
+    private func openEditView(initialTextViewText: String, initialDate: Date, initialFlag: Reminder?, initialPriority: Priority, initialTaskOrderIndex: Int) {
+        let editActivityVC = AddActivityWithDateViewController(initialTextViewText: initialTextViewText, initialTitle: "Edit Task", initialDate: initialDate, initialFlag: initialFlag, initialPriority: initialPriority, initialTaskOrderIndex: initialTaskOrderIndex)
         editActivityVC.delegate = self
         let editActivityNavigationController = UINavigationController(rootViewController: editActivityVC)
         editActivityNavigationController.modalPresentationStyle = .formSheet
@@ -244,11 +244,16 @@ extension TodayTabViewController: UITableViewDataSource {
             
             let textViewText = (task?.taskTitle)!
             let reminder: Reminder? = task?.taskReminderRel
+            let date = (task?.taskDate)!
             let priority = (task?.taskPriorityRel)!
+            let orderIndex = (task?.taskOrderIndex)!
             
-            self.openEditView(initialTextViewText: textViewText, initialFlag: reminder, initialPriority: priority)
+            self.openEditView(initialTextViewText: textViewText, initialDate: date, initialFlag: reminder, initialPriority: priority, initialTaskOrderIndex: Int(orderIndex))
         })
-        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { (contextualAction, view, boolValue) in
+        let deleteButton = UIContextualAction(style: .destructive, title: "Delete", handler: { [unowned self] (contextualAction, view, boolValue) in
+            let task = Storage.storageData["Today"]?[indexPath.row]
+            
+            updateIndices(removedIndex: Int((task?.taskOrderIndex)!))
             
             let cell = tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
             self.cancelNotification(cell: cell)
@@ -265,6 +270,16 @@ extension TodayTabViewController: UITableViewDataSource {
             
             DispatchQueue.main.async {
                 Storage().saveData()
+            }
+            
+            do {
+                let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                
+                context.delete(task!)
+                
+                try context.save()
+            } catch {
+                print("Ошибка сохранения: \(error.localizedDescription)")
             }
         })
 
@@ -286,14 +301,26 @@ extension TodayTabViewController: UITableViewDataSource {
         
         
         let temp = Storage.storageData["Today"]?[sourceRowIndex]
+        let tempTaskOrderIndex = temp?.taskOrderIndex
         let destinationValue = Storage.storageData["Today"]?[destinationRowIndex]
+        let destinationTaskOrderIndex = destinationValue?.taskOrderIndex
         
+        destinationValue?.taskOrderIndex = tempTaskOrderIndex! // swap orderIndexes for CoreData
+        temp?.taskOrderIndex = destinationTaskOrderIndex!
         
         Storage.storageData["Today"]?[sourceRowIndex] = destinationValue!
         Storage.storageData["Today"]?[destinationRowIndex] = temp!
         
         
         print(Storage.storageData["Today"] as Any)
+        
+        do {
+            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            
+            try context.save()
+        } catch {
+            print("Ошибка сохранения: \(error.localizedDescription)")
+        }
     }
     
     @objc func reloadTableViewData() {
@@ -353,13 +380,19 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         let cell = self.tableView.cellForRow(at: indexPath) as! UICustomTableViewCell
         cancelNotification(cell: cell)
         
+        
         self.tableView.beginUpdates()
+        
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         let completedTask = Storage.storageData["Today"]?[indexPath.row].taskTitle
         let timeOfCompletion = Date()
+        
+        updateIndices(removedIndex: Int((task?.taskOrderIndex)!))
+        
         Storage.completedTasksData.append(key: completedTask!, value: timeOfCompletion)
         Storage.storageData["Today"]?.remove(at: indexPath.row)
         makeValueNilForTodayKeyIfNoActivities()
+        
         self.tableView.endUpdates()
         
         print(Storage.storageData["Today"] ?? "nil")
@@ -470,7 +503,6 @@ extension TodayTabViewController: AddActivityDelegate {
         }
         
         var keyToInsert: String
-        
         switch taskDateInString {
             case todayDateInString:
                 keyToInsert = "Today"
@@ -488,6 +520,8 @@ extension TodayTabViewController: AddActivityDelegate {
         guard Storage.storageData[keyToInsert] != nil else {
             
             Storage.storageData[keyToInsert] = [editedTask]
+            
+            updateIndices(removedIndex: Int((task?.taskOrderIndex)!))
             
             Storage.storageData["Today"]?.remove(at: (self.selectedRowIndexPath?.row)!)
             
@@ -514,7 +548,21 @@ extension TodayTabViewController: AddActivityDelegate {
         
         
         if taskDateInString != todayDateInString {
-            Storage.storageData[taskDateInString]?.append(editedTask)
+            updateIndices(removedIndex: Int((task?.taskOrderIndex)!))
+            
+            Storage.storageData["Today"]?.remove(at: (self.selectedRowIndexPath?.row)!)
+            
+            do {
+                let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+                
+                context.delete(task!)
+                
+                try context.save()
+            } catch {
+                print("Saving error: editSelectedTask 545")
+            }
+            
+            Storage.storageData[keyToInsert]?.append(editedTask)
         } else if taskDateInString == todayDateInString {
             if editedTask.taskReminderRel != nil {
                 let cell = self.tableView.cellForRow(at: selectedRowIndexPath!)
@@ -527,6 +575,7 @@ extension TodayTabViewController: AddActivityDelegate {
             let selectedRowIndex = (self.selectedRowIndexPath?.row)!
             Storage.storageData["Today"]?.remove(at: selectedRowIndex)
             
+            
             do {
                 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
                 
@@ -537,6 +586,7 @@ extension TodayTabViewController: AddActivityDelegate {
                 print("Saving error: editSelectedTask 545")
             }
             
+            
             Storage.storageData["Today"]?.insert(editedTask, at: selectedRowIndex)
         }
         
@@ -546,6 +596,18 @@ extension TodayTabViewController: AddActivityDelegate {
         
         DispatchQueue.main.async {
             Storage().saveData()
+        }
+    }
+}
+
+extension TodayTabViewController {
+    private func updateIndices(removedIndex: Int) {
+        if let todayTasks = Storage.storageData["Today"] {
+            if todayTasks.count > removedIndex {
+                for i in removedIndex + 1..<todayTasks.count {
+                    todayTasks[i].taskOrderIndex -= 1
+                }
+            }
         }
     }
 }
