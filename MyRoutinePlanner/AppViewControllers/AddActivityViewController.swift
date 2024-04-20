@@ -126,7 +126,6 @@ class AddActivityViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        
         setupUI()
     }
     
@@ -181,7 +180,11 @@ class AddActivityViewController: UIViewController {
         let reminderDate = DateComponents(calendar: calendar, year: selectedDateComponents.year, month: selectedDateComponents.month, day: selectedDateComponents.day, hour: selectedDateTimeConponents.hour, minute: selectedDateTimeConponents.minute).date!
         let reminderIdentifier = "\(self.textView.text!)-\(Date().timeIntervalSince1970)-notification"
         
-        let reminder = Reminder(reminderDate: reminderDate, reminderIdentifier: reminderIdentifier)
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        
+        let reminder = Reminder(context: context)
+        reminder.reminderIdentifier = reminderIdentifier
+        reminder.reminderDate = reminderDate
         
         return reminder
     }
@@ -350,9 +353,38 @@ class AddActivityViewController: UIViewController {
                 withReminder = createReminder()
             }
             
-            let priority = Priority(priorityLevel: priorityPicker.selectedInteger!)
+            var color: UIColor = .gray
+            switch priorityPicker.selectedInteger {
+                case 1:
+                    color = .red
+                case 2:
+                    color = .orange
+                case 3:
+                    color = .blue
+                default:
+                    color = .gray
+            }
             
-            delegate?.saveNewTask(self.textView.text, taskDate: Date(), withReminder: self.withReminder, priority: priority)
+            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            
+            let priority = Priority(context: context)
+            priority.priorityLevel = Int64(priorityPicker.selectedInteger!)
+            priority.priorityColor = color.toHexString()
+            
+            let task = MyTask(context: context)
+            task.taskTitle = self.textView.text
+            task.taskDate = Date()
+            task.taskReminderRel = withReminder
+            task.taskPriorityRel = priority
+            task.taskOrderIndex = Storage.storageData["Today"]?.count != nil ? Int64((Storage.storageData["Today"]?.count)!) : 0
+            
+            do {
+                try context.save()
+            } catch {
+                print("Ошибка сохранения: \(error.localizedDescription)")
+            }
+            
+            delegate?.saveNewTask(task)
             
             addReminder()
             dismiss(animated: true)

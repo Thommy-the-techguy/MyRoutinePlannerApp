@@ -29,20 +29,36 @@ class NotificationsViewController: UIViewController {
     
     var isNotificationsOn = true
     
-    typealias TableViewTextFillers = (preferenceText: String, subText: String?, footerText: String?)
+    typealias TableViewTextFillers = (preferenceText: String, subText: String?)
     
     let tableViewData = CustomKeyValuePairs(
         arrayOfKeys: ["ENABLE NOTIFICATIONS", nil],
         arrayOfValues: [
             [
-                TableViewTextFillers(preferenceText: "Open Settings App", subText: nil, footerText: "Push notifications for MyRoutinePlanner are turned off. To turn them on, visit the Settings app."),
+                TableViewTextFillers(preferenceText: "Open Settings App", subText: nil),
             ],
             [
-                TableViewTextFillers(preferenceText: "Morning overview", subText: "Organize your tasks for the day", footerText: nil),
-                TableViewTextFillers(preferenceText: "Evening review", subText: "Review what's left to get done", footerText: nil),
+                TableViewTextFillers(preferenceText: "Morning overview", subText: "Organize your tasks for the day"),
+                TableViewTextFillers(preferenceText: "Evening review", subText: "Review what's left to get done"),
             ],
         ]
     )
+    
+    private func checkIfNotificationsAreEnabled() -> Bool {
+        let current = UNUserNotificationCenter.current()
+
+        current.getNotificationSettings(completionHandler: { [unowned self] (settings) in
+            if settings.authorizationStatus == .notDetermined {
+                // Notification permission has not been asked yet, go for it!
+                isNotificationsOn = false
+            } else if settings.authorizationStatus == .denied {
+                // Notification permission was previously denied, go to settings & privacy to re-enable
+                isNotificationsOn = false
+            }
+        })
+        
+        return isNotificationsOn
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,7 +122,7 @@ extension NotificationsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "NotificationsPreferencesCell", for: indexPath) as! UICustomTableViewCell
         
-        let (preferenceName, subText, footerText) = tableViewData.getValue(for: indexPath.section)[indexPath.row]
+        let (preferenceName, subText) = tableViewData.getValue(for: indexPath.section)[indexPath.row]
         
         cell.getCheckButton().setImage(nil, for: .normal)
         cell.getCellTextLabel().text = preferenceName
@@ -174,7 +190,11 @@ extension NotificationsViewController: UITableViewDragDelegate {
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        return tableViewData.getValue(for: section)[0].footerText
+        if section == 0 {
+            return checkIfNotificationsAreEnabled() ? footerTextDisabled : footerTextEnabled
+        } else {
+            return nil
+        }
     }
 }
 

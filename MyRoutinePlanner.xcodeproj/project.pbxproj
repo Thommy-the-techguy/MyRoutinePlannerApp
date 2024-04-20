@@ -14,7 +14,7 @@
 		AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */; };
 		AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC64C9382B6BF2A500B971A8 /* Storage.swift */; };
 		AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */; };
-		AC9320362BB190500034ADE4 /* Reminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9320352BB190500034ADE4 /* Reminder.swift */; };
+		AC9320362BB190500034ADE4 /* Reminder1.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9320352BB190500034ADE4 /* Reminder1.swift */; };
 		AC9521762BB2D570007092AC /* Savable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9521752BB2D570007092AC /* Savable.swift */; };
 		AC9521782BB2D78B007092AC /* CodableKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */; };
 		ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D92B2B540DDB00726D85 /* AppDelegate.swift */; };
@@ -27,7 +27,7 @@
 		ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */; };
 		ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */; };
 		ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */; };
-		ACA4AFFE2BB5B34A0034F1C5 /* Priority.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */; };
+		ACA4AFFE2BB5B34A0034F1C5 /* Priority1.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA4AFFD2BB5B3490034F1C5 /* Priority1.swift */; };
 		ACA4B0022BB5C1450034F1C5 /* IntegerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA4B0012BB5C1450034F1C5 /* IntegerPickerView.swift */; };
 		ACAF06822B8115C80065A2EA /* KeyValuePairsWithFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */; };
 		ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */; };
@@ -36,6 +36,14 @@
 		ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */; };
 		ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */; };
 		ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */; };
+		ACE832E52BCA8BA500343808 /* TaskPlanner.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACE832E32BCA8BA500343808 /* TaskPlanner.xcdatamodeld */; };
+		ACE832FA2BCA927100343808 /* Reminder+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE832F62BCA927100343808 /* Reminder+CoreDataClass.swift */; };
+		ACE832FB2BCA927100343808 /* Reminder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */; };
+		ACE8330A2BCA995F00343808 /* Priority+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE833062BCA995F00343808 /* Priority+CoreDataClass.swift */; };
+		ACE8330B2BCA995F00343808 /* Priority+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE833072BCA995F00343808 /* Priority+CoreDataProperties.swift */; };
+		ACE8330C2BCA995F00343808 /* MyTask+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE833082BCA995F00343808 /* MyTask+CoreDataClass.swift */; };
+		ACE8330D2BCA995F00343808 /* MyTask+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE833092BCA995F00343808 /* MyTask+CoreDataProperties.swift */; };
+		ACE8330F2BCAAA3700343808 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE8330E2BCAAA3700343808 /* CoreDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +54,7 @@
 		AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		AC64C9382B6BF2A500B971A8 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		AC7557E22B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityWithDateViewController.swift; sourceTree = "<group>"; };
-		AC9320352BB190500034ADE4 /* Reminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reminder.swift; sourceTree = "<group>"; };
+		AC9320352BB190500034ADE4 /* Reminder1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reminder1.swift; sourceTree = "<group>"; };
 		AC9521752BB2D570007092AC /* Savable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Savable.swift; sourceTree = "<group>"; };
 		AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableKeyValuePairs.swift; sourceTree = "<group>"; };
 		ACA3D9282B540DDB00726D85 /* MyRoutinePlanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyRoutinePlanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,7 +69,7 @@
 		ACA3D9422B54213D00726D85 /* InboxTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxTabViewController.swift; sourceTree = "<group>"; };
 		ACA3D9442B54214800726D85 /* CompletedTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedTabViewController.swift; sourceTree = "<group>"; };
 		ACA3D9462B54215500726D85 /* SettingsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabViewController.swift; sourceTree = "<group>"; };
-		ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Priority.swift; sourceTree = "<group>"; };
+		ACA4AFFD2BB5B3490034F1C5 /* Priority1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Priority1.swift; sourceTree = "<group>"; };
 		ACA4B0012BB5C1450034F1C5 /* IntegerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegerPickerView.swift; sourceTree = "<group>"; };
 		ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValuePairsWithFlag.swift; sourceTree = "<group>"; };
 		ACC2A7E62B55625800582ECB /* UICellAccessoryCheckbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICellAccessoryCheckbox.swift; sourceTree = "<group>"; };
@@ -70,6 +78,14 @@
 		ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCellDelegate.swift; sourceTree = "<group>"; };
 		ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyValuePairs.swift; sourceTree = "<group>"; };
 		ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityDelegate.swift; sourceTree = "<group>"; };
+		ACE832E42BCA8BA500343808 /* TaskPlanner.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TaskPlanner.xcdatamodel; sourceTree = "<group>"; };
+		ACE832F62BCA927100343808 /* Reminder+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reminder+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reminder+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ACE833062BCA995F00343808 /* Priority+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Priority+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ACE833072BCA995F00343808 /* Priority+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Priority+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ACE833082BCA995F00343808 /* MyTask+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyTask+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ACE833092BCA995F00343808 /* MyTask+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyTask+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		ACE8330E2BCAAA3700343808 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				AC64C9382B6BF2A500B971A8 /* Storage.swift */,
+				ACE832E32BCA8BA500343808 /* TaskPlanner.xcdatamodeld */,
+				ACE8330E2BCAAA3700343808 /* CoreDataManager.swift */,
 			);
 			path = storage;
 			sourceTree = "<group>";
@@ -167,11 +185,17 @@
 		ACC2A7F12B595D9D00582ECB /* CustomStructures */ = {
 			isa = PBXGroup;
 			children = (
+				ACE833062BCA995F00343808 /* Priority+CoreDataClass.swift */,
+				ACE833072BCA995F00343808 /* Priority+CoreDataProperties.swift */,
+				ACE833082BCA995F00343808 /* MyTask+CoreDataClass.swift */,
+				ACE833092BCA995F00343808 /* MyTask+CoreDataProperties.swift */,
+				ACE832F62BCA927100343808 /* Reminder+CoreDataClass.swift */,
+				ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */,
 				ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */,
 				ACAF06812B8115C80065A2EA /* KeyValuePairsWithFlag.swift */,
-				AC9320352BB190500034ADE4 /* Reminder.swift */,
+				AC9320352BB190500034ADE4 /* Reminder1.swift */,
 				AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */,
-				ACA4AFFD2BB5B3490034F1C5 /* Priority.swift */,
+				ACA4AFFD2BB5B3490034F1C5 /* Priority1.swift */,
 			);
 			path = CustomStructures;
 			sourceTree = "<group>";
@@ -251,26 +275,34 @@
 				ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */,
 				ACAF06822B8115C80065A2EA /* KeyValuePairsWithFlag.swift in Sources */,
 				AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */,
+				ACE8330F2BCAAA3700343808 /* CoreDataManager.swift in Sources */,
 				ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */,
+				ACE8330D2BCA995F00343808 /* MyTask+CoreDataProperties.swift in Sources */,
+				ACE8330B2BCA995F00343808 /* Priority+CoreDataProperties.swift in Sources */,
 				ACC2A7E72B55625800582ECB /* UICellAccessoryCheckbox.swift in Sources */,
 				AC7557E32B5D4DDE00B1FB96 /* AddActivityWithDateViewController.swift in Sources */,
+				ACE832FB2BCA927100343808 /* Reminder+CoreDataProperties.swift in Sources */,
+				ACE832E52BCA8BA500343808 /* TaskPlanner.xcdatamodeld in Sources */,
 				ACA3D9432B54213D00726D85 /* InboxTabViewController.swift in Sources */,
-				ACA4AFFE2BB5B34A0034F1C5 /* Priority.swift in Sources */,
+				ACA4AFFE2BB5B34A0034F1C5 /* Priority1.swift in Sources */,
 				ACA3D9302B540DDB00726D85 /* ViewController.swift in Sources */,
 				ACC2A7E92B55C1BE00582ECB /* AddActivityViewController.swift in Sources */,
 				AC2407052BB482C1000611D2 /* MorningOverviewViewController.swift in Sources */,
 				AC9521782BB2D78B007092AC /* CodableKeyValuePairs.swift in Sources */,
 				ACC2A7ED2B56A5E400582ECB /* UICustomTableViewCell.swift in Sources */,
 				ACA3D92C2B540DDB00726D85 /* AppDelegate.swift in Sources */,
+				ACE8330C2BCA995F00343808 /* MyTask+CoreDataClass.swift in Sources */,
+				ACE8330A2BCA995F00343808 /* Priority+CoreDataClass.swift in Sources */,
 				ACA3D9412B54212D00726D85 /* TodayTabViewController.swift in Sources */,
 				AC1EE7EE2BA33F0F003356EC /* UISettingsTableViewCell.swift in Sources */,
-				AC9320362BB190500034ADE4 /* Reminder.swift in Sources */,
+				AC9320362BB190500034ADE4 /* Reminder1.swift in Sources */,
 				ACA3D9452B54214800726D85 /* CompletedTabViewController.swift in Sources */,
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
 				AC2407072BB48325000611D2 /* EveningReviewViewController.swift in Sources */,
 				ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */,
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 				AC9521762BB2D570007092AC /* Savable.swift in Sources */,
+				ACE832FA2BCA927100343808 /* Reminder+CoreDataClass.swift in Sources */,
 				AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */,
 				ACA4B0022BB5C1450034F1C5 /* IntegerPickerView.swift in Sources */,
 			);
@@ -507,6 +539,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		ACE832E32BCA8BA500343808 /* TaskPlanner.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				ACE832E42BCA8BA500343808 /* TaskPlanner.xcdatamodel */,
+			);
+			currentVersion = ACE832E42BCA8BA500343808 /* TaskPlanner.xcdatamodel */;
+			path = TaskPlanner.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = ACA3D9202B540DDA00726D85 /* Project object */;
 }

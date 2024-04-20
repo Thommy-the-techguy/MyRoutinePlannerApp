@@ -7,11 +7,32 @@
 
 import UIKit
 import NotificationCenter
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let storage = Storage()
+    
+    var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "TaskPlanner")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
+    
+    func saveContext() {
+        if persistentContainer.viewContext.hasChanges {
+            do {
+                try persistentContainer.viewContext.save()
+            } catch {
+                print("An error occurred while saving: \(error)")
+            }
+        }
+    }
     
     func startAlarmCleaningThread() {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -42,6 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Permission for push notifications denied.")
             }
         }
+        
+        storage.fetchTasks()
         
         startAlarmCleaningThread()
         

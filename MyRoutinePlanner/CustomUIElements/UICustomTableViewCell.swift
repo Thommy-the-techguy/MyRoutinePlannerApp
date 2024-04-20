@@ -64,11 +64,11 @@ class UICustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setText(_ text: String) {
+    func setText(_ text: String?) {
         self.label.text = text
     }
     
-    func setDate(_ date: Date) {
+    func setDate(_ date: Date?) {
         self.date = date
         if #available(iOS 15, *) {
             dateTextLabel.text = self.date?.formatted(date: .numeric, time: .omitted)
@@ -113,8 +113,8 @@ class UICustomTableViewCell: UITableViewCell {
             checkButton.bottomAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.bottomAnchor),
             checkButton.leadingAnchor.constraint(equalTo: self.contentView.layoutMarginsGuide.leadingAnchor),
             checkButton.trailingAnchor.constraint(equalTo: self.label.leadingAnchor, constant: -15.0),
-            checkButton.widthAnchor.constraint(lessThanOrEqualToConstant: 20.0),
-            checkButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 20.0),
+            checkButton.widthAnchor.constraint(lessThanOrEqualToConstant: 24.0),
+            checkButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 24.0),
             
 
             label.leadingAnchor.constraint(equalTo: self.checkButton.trailingAnchor, constant: 15.0),
