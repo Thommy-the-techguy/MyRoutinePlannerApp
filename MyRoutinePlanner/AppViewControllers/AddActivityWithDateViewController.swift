@@ -566,7 +566,7 @@ class AddActivityWithDateViewController: UIViewController {
         let alertController = UIAlertController(title: "Error", message: "You have to write something first in order to save it!", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
         
-        if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
+        if self.textView.text.isEmpty || self.textView.text == nil || self.textView.text == self.placeholderText || self.textView.text.trimmingCharacters(in: .whitespaces).isEmpty {
             self.present(alertController, animated: true)
         } else {
             if !self.notificationOptionView.isHidden {
@@ -679,7 +679,7 @@ class AddActivityWithDateViewController: UIViewController {
         let alertController = UIAlertController(title: "Error", message: "You have to write something first in order to save it!", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
         
-        if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
+        if self.textView.text.isEmpty || self.textView.text == nil || self.textView.text == self.placeholderText || self.textView.text.trimmingCharacters(in: .whitespaces).isEmpty {
             self.present(alertController, animated: true)
         } else {
             if let reminder = self.withReminder {
@@ -688,7 +688,6 @@ class AddActivityWithDateViewController: UIViewController {
                 self.withReminder?.reminderIdentifier = reminderIdentifier
             }
             
-//            let priority = Priority(priorityLevel: priorityPicker.selectedInteger!)
             let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
             
             var color: UIColor = .gray

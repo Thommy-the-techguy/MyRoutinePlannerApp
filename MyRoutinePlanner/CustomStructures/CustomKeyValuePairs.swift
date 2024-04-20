@@ -66,7 +66,3 @@ struct CustomKeyValuePairs<K, V> {
         return (key, value)
     }
 }
-
-//extension CustomKeyValuePairs: Codable {
-//    
-//}

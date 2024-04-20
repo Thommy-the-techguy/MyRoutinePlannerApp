@@ -11,10 +11,6 @@ protocol Savable: Codable {
     
 }
 
-extension KeyValuePairsWithFlag: Savable {
-    
-}
-
 extension CodableKeyValuePairs: Savable {
     
 }
@@ -34,7 +30,3 @@ extension Date: Savable {
 extension [String]: Savable {
     
 }
-
-//extension Priority: Savable {
-//    
-//}

@@ -346,7 +346,7 @@ class AddActivityViewController: UIViewController {
         let alertController = UIAlertController(title: "Error", message: "You have to write something first in order to save it!", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
         
-        if self.textView.text == "" || self.textView.text == nil || self.textView.text == self.placeholderText {
+        if self.textView.text == nil || self.textView.text == self.placeholderText || self.textView.text.isEmpty || self.textView.text.trimmingCharacters(in: .whitespaces).isEmpty {
             self.present(alertController, animated: true)
         } else {
             if !self.notificationOptionView.isHidden {
