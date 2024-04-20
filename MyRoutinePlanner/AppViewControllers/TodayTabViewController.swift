@@ -176,8 +176,6 @@ extension TodayTabViewController: UITableViewDataSource {
     
     @objc private func cancelReminderWithIdentifier(sender: UIButton) {
         let cell = sender.superview as? UICustomTableViewCell
-//        let reminder = Storage.storageData["Today"]?.getReminder(for: (cell?.indexPath?.row)!)
-//        let reminderIdentifier = reminder?.reminderIdentifier
         let reminderIdentifier = Storage.storageData["Today"]?[(cell?.indexPath?.row)!].taskReminderRel?.reminderIdentifier
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
@@ -211,11 +209,6 @@ extension TodayTabViewController: UITableViewDataSource {
         //remove reminder from CoreData
         
         cell?.accessoryView?.isHidden = true
-        
-        // TODO: maybe needed
-//        DispatchQueue.main.async {
-//            Storage().saveData()
-//        }
     }
 
     

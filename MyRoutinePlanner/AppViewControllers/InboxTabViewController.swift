@@ -637,8 +637,6 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
                 }
             }
         }
-        // TODO: class should be resembled here also
-//        filteredData[currentKey]?.setReminder(for: (cell.indexPath?.row)!, withReminder: nil)
         
         cell.accessoryView?.isHidden = true
     }
