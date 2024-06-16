@@ -227,7 +227,7 @@ extension InboxTabViewController: UITableViewDataSource {
         
         
         let taskPriority = Storage.storageData[currentKey]?[indexPath.row].taskPriorityRel
-        let color = UIColor(hexString: (taskPriority?.priorityColor)!)!
+        let color = UIColor(hexString: (taskPriority?.priorityColor)!)
         
         let buttonsColor = color
         // MARK: - maybe not even necessary
@@ -546,7 +546,7 @@ extension InboxTabViewController: CustomTableViewCellDelegate {
         
         
         let priority = Storage.storageData[currentKey]?[indexPath.row].taskPriorityRel
-        let color = UIColor(hexString: (priority?.priorityColor)!)!
+        let color = UIColor(hexString: (priority?.priorityColor)!)
         
         // checked circle color set
         let buttonsColor = color

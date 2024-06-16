@@ -360,7 +360,7 @@ extension TodayTabViewController: CustomTableViewCellDelegate {
         // checked circle color set
         let task = Storage.storageData["Today"]?[indexPath.row]
         let taskPriority = task?.taskPriorityRel
-        let color: UIColor = UIColor(hexString: (taskPriority?.priorityColor)!)!
+        let color: UIColor = UIColor(hexString: (taskPriority?.priorityColor)!)
         
         let buttonsColor = color
         

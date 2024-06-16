@@ -10,7 +10,6 @@
 		AC1EE7EE2BA33F0F003356EC /* UISettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */; };
 		AC2407052BB482C1000611D2 /* MorningOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2407042BB482C1000611D2 /* MorningOverviewViewController.swift */; };
 		AC2407072BB48325000611D2 /* EveningReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2407062BB48325000611D2 /* EveningReviewViewController.swift */; };
-		AC313C8A2BD413570080DED9 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC313C892BD413570080DED9 /* UIColorExtension.swift */; };
 		AC58BDF32BA47E4700A9B981 /* TextSizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */; };
 		AC58BDF52BA47E6B00A9B981 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */; };
 		AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC64C9382B6BF2A500B971A8 /* Storage.swift */; };
@@ -34,6 +33,7 @@
 		ACC2A7F02B56D28F00582ECB /* CustomTableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */; };
 		ACC2A7F32B595DC800582ECB /* CustomKeyValuePairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */; };
 		ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */; };
+		ACC430962C1F57F000C31F4E /* UIColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC430952C1F57F000C31F4E /* UIColorExt.swift */; };
 		ACE832E52BCA8BA500343808 /* TaskPlanner.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACE832E32BCA8BA500343808 /* TaskPlanner.xcdatamodeld */; };
 		ACE832FA2BCA927100343808 /* Reminder+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE832F62BCA927100343808 /* Reminder+CoreDataClass.swift */; };
 		ACE832FB2BCA927100343808 /* Reminder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */; };
@@ -47,7 +47,6 @@
 		AC1EE7ED2BA33F0F003356EC /* UISettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISettingsTableViewCell.swift; sourceTree = "<group>"; };
 		AC2407042BB482C1000611D2 /* MorningOverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorningOverviewViewController.swift; sourceTree = "<group>"; };
 		AC2407062BB48325000611D2 /* EveningReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EveningReviewViewController.swift; sourceTree = "<group>"; };
-		AC313C892BD413570080DED9 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIColorExtension.swift; path = ../../../../.Trash/UIColorExtension.swift; sourceTree = "<group>"; };
 		AC58BDF22BA47E4700A9B981 /* TextSizeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeViewController.swift; sourceTree = "<group>"; };
 		AC58BDF42BA47E6B00A9B981 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		AC64C9382B6BF2A500B971A8 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
@@ -73,6 +72,7 @@
 		ACC2A7EF2B56D28F00582ECB /* CustomTableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCellDelegate.swift; sourceTree = "<group>"; };
 		ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomKeyValuePairs.swift; sourceTree = "<group>"; };
 		ACC2A7F42B59C07900582ECB /* AddActivityDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddActivityDelegate.swift; sourceTree = "<group>"; };
+		ACC430952C1F57F000C31F4E /* UIColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExt.swift; sourceTree = "<group>"; };
 		ACE832E42BCA8BA500343808 /* TaskPlanner.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TaskPlanner.xcdatamodel; sourceTree = "<group>"; };
 		ACE832F62BCA927100343808 /* Reminder+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reminder+CoreDataClass.swift"; sourceTree = "<group>"; };
 		ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reminder+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -186,7 +186,7 @@
 				ACE832F72BCA927100343808 /* Reminder+CoreDataProperties.swift */,
 				ACC2A7F22B595DC800582ECB /* CustomKeyValuePairs.swift */,
 				AC9521772BB2D78B007092AC /* CodableKeyValuePairs.swift */,
-				AC313C892BD413570080DED9 /* UIColorExtension.swift */,
+				ACC430952C1F57F000C31F4E /* UIColorExt.swift */,
 			);
 			path = CustomStructures;
 			sourceTree = "<group>";
@@ -287,10 +287,10 @@
 				ACA3D92E2B540DDB00726D85 /* SceneDelegate.swift in Sources */,
 				AC2407072BB48325000611D2 /* EveningReviewViewController.swift in Sources */,
 				ACA3D9472B54215500726D85 /* SettingsTabViewController.swift in Sources */,
+				ACC430962C1F57F000C31F4E /* UIColorExt.swift in Sources */,
 				ACC2A7F52B59C07900582ECB /* AddActivityDelegate.swift in Sources */,
 				AC9521762BB2D570007092AC /* Savable.swift in Sources */,
 				ACE832FA2BCA927100343808 /* Reminder+CoreDataClass.swift in Sources */,
-				AC313C8A2BD413570080DED9 /* UIColorExtension.swift in Sources */,
 				AC64C9392B6BF2A500B971A8 /* Storage.swift in Sources */,
 				ACA4B0022BB5C1450034F1C5 /* IntegerPickerView.swift in Sources */,
 			);
